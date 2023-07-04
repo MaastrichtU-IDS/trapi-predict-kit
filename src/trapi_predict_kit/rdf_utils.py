@@ -18,8 +18,6 @@ OPENPREDICT_GRAPH = "https://w3id.org/openpredict/graph"
 OPENPREDICT_NAMESPACE = "https://w3id.org/openpredict/"
 BIOLINK = Namespace("https://w3id.org/biolink/vocab/")
 
-RDFS = Namespace("http://www.w3.org/2000/01/rdf-schema#")
-RDF = Namespace("http://www.w3.org/1999/02/22-rdf-syntax-ns#")
 OWL = Namespace("http://www.w3.org/2002/07/owl#")
 SKOS = Namespace("http://www.w3.org/2004/02/skos/core#")
 SCHEMA = Namespace("http://schema.org/")
@@ -286,11 +284,11 @@ def retrieve_models(g):
         PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
         SELECT DISTINCT ?run ?runId ?generatedAtTime ?featureId ?accuracy ?average_precision ?f1 ?precision ?recall ?roc_auc
         WHERE {
-    		?run a mls:Run ;
+            ?run a mls:Run ;
                 dc:identifier ?runId ;
-           		prov:generatedAtTime ?generatedAtTime ;
+                prov:generatedAtTime ?generatedAtTime ;
                 mls:hasInput ?features ;
-            	mls:hasOutput ?evaluation .
+                mls:hasOutput ?evaluation .
             ?evaluation a mls:ModelEvaluation  .
             ?features dc:identifier ?featureId .
 

@@ -36,6 +36,7 @@ def get_predictions(input_id: str, options: PredictOptions) -> PredictOutput:
 
 
 def test_trapi_predict_decorator():
+    expect = 2
     res = get_predictions("drugbank:DB00002", PredictOptions())
-    assert len(get_predictions._trapi_predict["edges"]) == 2
+    assert len(get_predictions._trapi_predict["edges"]) == expect
     assert len(res["hits"]) == 1

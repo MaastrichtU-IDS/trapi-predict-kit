@@ -11,17 +11,17 @@ from trapi_predict_kit.predict_output import PredictOptions
 from trapi_predict_kit.trapi_parser import resolve_trapi_query
 from trapi_predict_kit.utils import log
 
+REQUIRED_TAGS = [
+    {"name": "reasoner"},
+    {"name": "trapi"},
+    {"name": "models"},
+    {"name": "openpredict"},
+    {"name": "translator"},
+]
+
 
 class TRAPI(FastAPI):
     """Translator Reasoner API - wrapper for FastAPI."""
-
-    required_tags = [
-        {"name": "reasoner"},
-        {"name": "trapi"},
-        {"name": "models"},
-        {"name": "openpredict"},
-        {"name": "translator"},
-    ]
 
     def __init__(
         self,
@@ -57,7 +57,7 @@ class TRAPI(FastAPI):
             allow_headers=["*"],
         )
 
-        TRAPI_EXAMPLE = {
+        trapi_example = {
             "message": {
                 "query_graph": {
                     "edges": {"e01": {"object": "n1", "predicates": ["biolink:treated_by"], "subject": "n0"}},
@@ -112,7 +112,7 @@ You can also try this query to retrieve similar entities to a given drug:
             response_model=Query,
             tags=["reasoner"],
         )
-        def post_reasoner_predict(request_body: Query = Body(..., example=TRAPI_EXAMPLE)) -> Query:
+        def post_reasoner_predict(request_body: Query = Body(..., example=trapi_example)) -> Query:
             """Get predicted associations for a given ReasonerAPI query.
 
             :param request_body: The ReasonerStdAPI query in JSON
@@ -234,7 +234,7 @@ You can also try this query to retrieve similar entities to a given drug:
         if self.openapi_schema:
             return self.openapi_schema
 
-        tags = self.required_tags
+        tags = REQUIRED_TAGS
         if self.openapi_tags:
             tags += self.openapi_tags
 

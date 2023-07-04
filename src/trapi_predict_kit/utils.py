@@ -52,7 +52,9 @@ def get_entities_labels(entity_list):
     for chunk in split_list(entity_list, 300):
         try:
             get_label_result = requests.get(
-                "https://nodenormalization-sri.renci.org/get_normalized_nodes", params={"curie": chunk}
+                "https://nodenormalization-sri.renci.org/get_normalized_nodes",
+                params={"curie": chunk},
+                timeout=settings.TIMEOUT,
             )
             label_results.update(get_label_result.json())
             # print(f"get_entities_labels {get_label_result}")
@@ -70,7 +72,9 @@ def normalize_id_to_translator(ids_list):
     """
     converted_ids_obj = {}
     resolve_curies = requests.get(
-        "https://nodenormalization-sri.renci.org/get_normalized_nodes", params={"curie": ids_list}
+        "https://nodenormalization-sri.renci.org/get_normalized_nodes",
+        params={"curie": ids_list},
+        timeout=settings.TIMEOUT,
     )
     # Get corresponding OMIM IDs for MONDO IDs if match
     resp = resolve_curies.json()
@@ -80,7 +84,7 @@ def normalize_id_to_translator(ids_list):
             pref_id = translator_ids["id"]["identifier"]
             log.info(converted_id + " > " + pref_id)
             converted_ids_obj[converted_id] = pref_id
-        except:
+        except Exception:
             log.error("❌️ " + converted_id + " > " + str(translator_ids))
 
     return converted_ids_obj
@@ -91,7 +95,9 @@ def get_entity_types(entity):
     for an ID https://nodenormalization-sri.renci.org/docs
     """
     resolve_curies = requests.get(
-        "https://nodenormalization-sri.renci.org/get_normalized_nodes", params={"curie": [entity]}
+        "https://nodenormalization-sri.renci.org/get_normalized_nodes",
+        params={"curie": [entity]},
+        timeout=settings.TIMEOUT,
     )
     # Get corresponding OMIM IDs for MONDO IDs if match
     resp = resolve_curies.json()

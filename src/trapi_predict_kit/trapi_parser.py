@@ -17,7 +17,7 @@ def get_biolink_parents(concept):
     concept_snakecase = re.sub(r"(?<!^)(?=[A-Z])", "_", concept_snakecase).lower()
     query_url = f"https://bl-lookup-sri.renci.org/bl/{concept_snakecase}/ancestors"
     try:
-        resolve_curies = requests.get(query_url)
+        resolve_curies = requests.get(query_url, timeout=settings.TIMEOUT)
         # TODO: can't specify a BioLink version because asking for v3.1.0 does not exist, so we use latest
         # resolve_curies = requests.get(query_url,
         #                     params={'version': f'v{settings.BIOLINK_VERSION}'})
@@ -45,7 +45,7 @@ def resolve_ids_with_nodenormalization_api(resolve_ids_list, resolved_ids_object
             resolve_curies = requests.get(
                 "https://nodenormalization-sri.renci.org/get_normalized_nodes",
                 params={"curie": ids_to_normalize},
-                timeout=120,
+                timeout=settings.TIMEOUT,
             )
             # Get corresponding OMIM IDs for MONDO IDs if match
             resp = resolve_curies.json()
@@ -114,11 +114,7 @@ def resolve_trapi_query(reasoner_query, endpoints_list):
             "qg_source_id": qg_edge["subject"],
             "qg_target_id": qg_edge["object"],
         }
-        if "predicates" in qg_edge:
-            query_plan[edge_id]["predicates"] = qg_edge["predicates"]
-        else:
-            # Quick fix: in case no relation is provided
-            query_plan[edge_id]["predicates"] = ["biolink:treats"]
+        query_plan[edge_id]["predicates"] = qg_edge["predicates"]
 
         # If single value provided for predicate: make it an array
         # if not isinstance(query_plan[edge_id]['predicate'], list):
