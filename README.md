@@ -1,5 +1,6 @@
 <div align="center">
-# TRAPI Predict Kit
+
+# 🪄 TRAPI Predict Kit
 
 <!--
 
@@ -14,7 +15,7 @@
 
 </div>
 
-A package to help create and deploy Translator Reasoner APIs (TRAPI) from any prediction model.
+A package to help create and deploy Translator Reasoner APIs (TRAPI) from any prediction model exposed as a regular python function.
 
 ## 📦️ Installation
 
@@ -24,7 +25,14 @@ This package requires Python >=3.7, simply install it with:
 pip install trapi-predict-kit
 ```
 
+To also include uvicorn/gunicorn for deployment:
+
+```bash
+pip install trapi-predict-kit[web]
+```
+
 ## 🪄 Usage
+
 ### 🔮 Define the prediction endpoint
 
 The `openpredict` package provides a decorator `@trapi_predict` to annotate your functions that generate predictions. Predictions generated from functions decorated with `@trapi_predict` can easily be imported in the Translator OpenPredict API, exposed as an API endpoint to get predictions from the web, and queried through the  Translator Reasoner API (TRAPI).
@@ -192,6 +200,14 @@ Install the dependencies in a local virtual environment:
 
 ```bash
 hatch -v env create
+```
+
+### 🧑‍💻 Develop
+
+Run the API for development defined in `tests/dev.py`:
+
+```bash
+hatch run api
 ```
 
 ### ☑️ Run tests

@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 requires-python = ">=3.7"
 name = "trapi-predict-kit"
-description = "A package to help create and deploy Translator Reasoner APIs (TRAPI) from any prediction model."
+description = "A package to help create and deploy Translator Reasoner APIs (TRAPI) from any prediction model exposed as a regular python function."
 readme = "README.md"
 license = { file = "LICENSE.txt" }
 authors = [
@@ -45,6 +45,10 @@ dependencies = [
 
 
 [project.optional-dependencies]
+web = [
+    "uvicorn >=0.15.0",
+    "gunicorn >=20.0.4",
+]
 train = [
     "mlem >=0.4.0",
 ]
@@ -54,10 +58,6 @@ test = [
     "ruff >=0.0.219",
     "mypy >=0.991",
     "black >= 22.8.0",
-]
-deploy = [
-    "uvicorn >=0.15.0",
-    "gunicorn >=20.0.4",
 ]
 
 
@@ -73,7 +73,7 @@ Source = "https://github.com/MaastrichtU-IDS/trapi-predict-kit"
 [tool.hatch.envs.default]
 features = [
     "test",
-    "deploy",
+    "web",
     "train",
 ]
 post-install-commands = [
