@@ -1,6 +1,6 @@
 # ---
 # dependencies:
-#   python.org: ^3.7
+#   python.org: ^3.7.17
 # ---
 [build-system]
 requires = ["hatchling"]

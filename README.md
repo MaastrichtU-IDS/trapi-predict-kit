@@ -265,4 +265,4 @@ You can also manually trigger the workflow from the Actions tab in your GitHub r
 # Dependencies
 | Project    | Version |
 | ---------- | ------- |
-| python.org | ^3.7    |
+| python.org | ^3.7.17 |
