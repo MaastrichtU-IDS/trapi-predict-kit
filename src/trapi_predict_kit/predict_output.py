@@ -18,7 +18,7 @@ class PredictOutput(BaseModel):
 
 
 class PredictOptions(BaseModel):
-    model_id: Optional[str] = 'openpredict_baseline'
+    model_id: Optional[str] = "openpredict_baseline"
     min_score: Optional[float] = None
     max_score: Optional[float] = None
     n_results: Optional[int] = None
@@ -26,7 +26,6 @@ class PredictOptions(BaseModel):
 
     class Config:
         arbitrary_types_allowed = True
-
 
 
 class TrainingOutput(BaseModel):

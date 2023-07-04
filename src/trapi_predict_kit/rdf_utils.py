@@ -9,13 +9,13 @@ from SPARQLWrapper import JSON, SPARQLWrapper
 
 from trapi_predict_kit.config import settings
 
-if not settings.OPENPREDICT_DATA_DIR.endswith('/'):
-    settings.OPENPREDICT_DATA_DIR += '/'
+if not settings.OPENPREDICT_DATA_DIR.endswith("/"):
+    settings.OPENPREDICT_DATA_DIR += "/"
 # RDF_DATA_PATH = settings.OPENPREDICT_DATA_DIR + 'openpredict-metadata.ttl'
 
 
-OPENPREDICT_GRAPH = 'https://w3id.org/openpredict/graph'
-OPENPREDICT_NAMESPACE = 'https://w3id.org/openpredict/'
+OPENPREDICT_GRAPH = "https://w3id.org/openpredict/graph"
+OPENPREDICT_NAMESPACE = "https://w3id.org/openpredict/"
 BIOLINK = Namespace("https://w3id.org/biolink/vocab/")
 
 RDFS = Namespace("http://www.w3.org/2000/01/rdf-schema#")
@@ -29,29 +29,29 @@ MLS = Namespace("http://www.w3.org/ns/mls#")
 OPENPREDICT = Namespace("https://w3id.org/openpredict/")
 
 # Get SPARQL endpoint credentials from environment variables
-SPARQL_ENDPOINT_PASSWORD = os.getenv('SPARQL_PASSWORD')
-SPARQL_ENDPOINT_USERNAME = os.getenv('SPARQL_USERNAME')
-SPARQL_ENDPOINT_URL = os.getenv('SPARQL_ENDPOINT_URL')
-SPARQL_ENDPOINT_UPDATE_URL = os.getenv('SPARQL_ENDPOINT_UPDATE_URL')
+SPARQL_ENDPOINT_PASSWORD = os.getenv("SPARQL_PASSWORD")
+SPARQL_ENDPOINT_USERNAME = os.getenv("SPARQL_USERNAME")
+SPARQL_ENDPOINT_URL = os.getenv("SPARQL_ENDPOINT_URL")
+SPARQL_ENDPOINT_UPDATE_URL = os.getenv("SPARQL_ENDPOINT_UPDATE_URL")
 
 # Default credentials for dev (if no environment variables provided)
 if not SPARQL_ENDPOINT_USERNAME:
     # SPARQL_ENDPOINT_USERNAME='import_user'
-    SPARQL_ENDPOINT_USERNAME = 'dba'
+    SPARQL_ENDPOINT_USERNAME = "dba"
 if not SPARQL_ENDPOINT_PASSWORD:
-    SPARQL_ENDPOINT_PASSWORD = 'dba'
+    SPARQL_ENDPOINT_PASSWORD = "dba"
 # if not SPARQL_ENDPOINT_URL:
 #    SPARQL_ENDPOINT_URL='http://localhost:8890/sparql'
 # SPARQL_ENDPOINT_URL='https://graphdb.dumontierlab.com/repositories/translator-openpredict-dev'
 # if not SPARQL_ENDPOINT_UPDATE_URL:
 #    SPARQL_ENDPOINT_UPDATE_URL = 'http://localhost:8890/sparql'
-    # SPARQL_ENDPOINT_UPDATE_URL='https://graphdb.dumontierlab.com/repositories/translator-openpredict-dev/statements'
+# SPARQL_ENDPOINT_UPDATE_URL='https://graphdb.dumontierlab.com/repositories/translator-openpredict-dev/statements'
 
 # Uncomment this line to test OpenPredict in dev mode using a RDF file instead of a SPARQL endpoint
-SPARQL_ENDPOINT_URL=None
+SPARQL_ENDPOINT_URL = None
 
 
-def get_models_graph(models_dir: str="models"):
+def get_models_graph(models_dir: str = "models"):
     """Helper function to get a graph with the RDF from all models given in a list"""
     g = Graph()
 
@@ -89,9 +89,9 @@ def query_sparql_endpoint(query, g, parameters=[]):
         results = []
         for row in qres:
             result = {}
-            for i, p in enumerate(parameters):
+            for _i, p in enumerate(parameters):
                 result[p] = {}
-                result[p]['value'] = str(row[p])
+                result[p]["value"] = str(row[p])
             results.append(result)
             # How can we iterate over the variable defined in the SPARQL query?
             # It only returns the results, without the variables list
@@ -122,7 +122,6 @@ def query_sparql_endpoint(query, g, parameters=[]):
 #     print('Triplestore initialized at ' + SPARQL_ENDPOINT_UPDATE_URL)
 
 
-
 def get_run_id(run_id=None):
     if not run_id:
         # Generate random UUID for the run ID
@@ -149,71 +148,64 @@ def get_run_metadata(scores, model_features, hyper_params, run_id=None):
         # Generate random UUID for the run ID
         run_id = str(uuid.uuid1())
 
-    run_uri = URIRef(OPENPREDICT_NAMESPACE + 'run/' + run_id)
+    run_uri = URIRef(OPENPREDICT_NAMESPACE + "run/" + run_id)
     run_prop_prefix = OPENPREDICT_NAMESPACE + run_id + "/"
-    evaluation_uri = URIRef(OPENPREDICT_NAMESPACE +
-                            'run/' + run_id + '/ModelEvaluation')
+    evaluation_uri = URIRef(OPENPREDICT_NAMESPACE + "run/" + run_id + "/ModelEvaluation")
     # The same for all run:
-    implementation_uri = URIRef(
-        OPENPREDICT_NAMESPACE + 'implementation/OpenPredict')
+    implementation_uri = URIRef(OPENPREDICT_NAMESPACE + "implementation/OpenPredict")
 
     # Add Run metadata
-    g.add((run_uri, RDF.type, MLS['Run']))
+    g.add((run_uri, RDF.type, MLS["Run"]))
     g.add((run_uri, DC.identifier, Literal(run_id)))
-    g.add((run_uri, PROV['generatedAtTime'], Literal(
-        datetime.now(), datatype=XSD.dateTime)))
-    g.add((run_uri, MLS['realizes'], OPENPREDICT['LogisticRegression']))
-    g.add((run_uri, MLS['executes'], implementation_uri))
-    g.add((run_uri, MLS['hasOutput'], evaluation_uri))
-    g.add((run_uri, MLS['hasOutput'], URIRef(run_prop_prefix + 'Model')))
+    g.add((run_uri, PROV["generatedAtTime"], Literal(datetime.now(), datatype=XSD.dateTime)))
+    g.add((run_uri, MLS["realizes"], OPENPREDICT["LogisticRegression"]))
+    g.add((run_uri, MLS["executes"], implementation_uri))
+    g.add((run_uri, MLS["hasOutput"], evaluation_uri))
+    g.add((run_uri, MLS["hasOutput"], URIRef(run_prop_prefix + "Model")))
 
     # Add Model, should we point it to the generated model?
-    g.add((URIRef(run_prop_prefix + 'Model'), RDF.type, MLS['Model']))
+    g.add((URIRef(run_prop_prefix + "Model"), RDF.type, MLS["Model"]))
 
     # Add implementation metadata
-    g.add((OPENPREDICT['LogisticRegression'], RDF.type, MLS['Algorithm']))
-    g.add((implementation_uri, RDF.type, MLS['Implementation']))
-    g.add((implementation_uri, MLS['implements'],
-          OPENPREDICT['LogisticRegression']))
+    g.add((OPENPREDICT["LogisticRegression"], RDF.type, MLS["Algorithm"]))
+    g.add((implementation_uri, RDF.type, MLS["Implementation"]))
+    g.add((implementation_uri, MLS["implements"], OPENPREDICT["LogisticRegression"]))
 
     # Add HyperParameters and their settings to implementation
     for hyperparam, hyperparam_setting in hyper_params.items():
-        hyperparam_uri = URIRef(
-            OPENPREDICT_NAMESPACE + 'HyperParameter/' + hyperparam)
-        g.add((implementation_uri, MLS['hasHyperParameter'], hyperparam_uri))
-        g.add((hyperparam_uri, RDF.type, MLS['HyperParameter']))
+        hyperparam_uri = URIRef(OPENPREDICT_NAMESPACE + "HyperParameter/" + hyperparam)
+        g.add((implementation_uri, MLS["hasHyperParameter"], hyperparam_uri))
+        g.add((hyperparam_uri, RDF.type, MLS["HyperParameter"]))
         g.add((hyperparam_uri, RDFS.label, Literal(hyperparam)))
 
-        hyperparam_setting_uri = URIRef(
-            OPENPREDICT_NAMESPACE + 'HyperParameterSetting/' + hyperparam)
-        g.add(
-            (implementation_uri, MLS['hasHyperParameter'], hyperparam_setting_uri))
-        g.add((hyperparam_setting_uri, RDF.type, MLS['HyperParameterSetting']))
-        g.add((hyperparam_setting_uri, MLS['specifiedBy'], hyperparam_uri))
-        g.add((hyperparam_setting_uri,
-              MLS['hasValue'], Literal(hyperparam_setting)))
-        g.add((run_uri, MLS['hasInput'], hyperparam_setting_uri))
+        hyperparam_setting_uri = URIRef(OPENPREDICT_NAMESPACE + "HyperParameterSetting/" + hyperparam)
+        g.add((implementation_uri, MLS["hasHyperParameter"], hyperparam_setting_uri))
+        g.add((hyperparam_setting_uri, RDF.type, MLS["HyperParameterSetting"]))
+        g.add((hyperparam_setting_uri, MLS["specifiedBy"], hyperparam_uri))
+        g.add((hyperparam_setting_uri, MLS["hasValue"], Literal(hyperparam_setting)))
+        g.add((run_uri, MLS["hasInput"], hyperparam_setting_uri))
 
     # TODO: improve how we retrieve features
     for feature in model_features:
-        feature_uri = URIRef(OPENPREDICT_NAMESPACE + 'feature/' + feature.replace(" ", "_").replace("(", "").replace(")", "") )
-        g.add((feature_uri, RDF.type, MLS['Feature']))
+        feature_uri = URIRef(
+            OPENPREDICT_NAMESPACE + "feature/" + feature.replace(" ", "_").replace("(", "").replace(")", "")
+        )
+        g.add((feature_uri, RDF.type, MLS["Feature"]))
         g.add((feature_uri, DC.identifier, Literal(feature)))
-        g.add((run_uri, MLS['hasInput'], feature_uri))
+        g.add((run_uri, MLS["hasInput"], feature_uri))
 
     # TODO: those 2 triples are for the PLEX ontology
-    g.add((evaluation_uri, RDF.type, PROV['Entity']))
-    g.add((evaluation_uri, PROV['wasGeneratedBy'], run_uri))
+    g.add((evaluation_uri, RDF.type, PROV["Entity"]))
+    g.add((evaluation_uri, PROV["wasGeneratedBy"], run_uri))
 
     # Add scores as EvaluationMeasures
-    g.add((evaluation_uri, RDF.type, MLS['ModelEvaluation']))
-    for key in scores.keys():
+    g.add((evaluation_uri, RDF.type, MLS["ModelEvaluation"]))
+    for key in scores:
         key_uri = URIRef(run_prop_prefix + key)
-        g.add((evaluation_uri, MLS['specifiedBy'], key_uri))
-        g.add((key_uri, RDF.type, MLS['EvaluationMeasure']))
+        g.add((evaluation_uri, MLS["specifiedBy"], key_uri))
+        g.add((key_uri, RDF.type, MLS["EvaluationMeasure"]))
         g.add((key_uri, RDFS.label, Literal(key)))
-        g.add((key_uri, MLS['hasValue'], Literal(
-            scores[key], datatype=XSD.double)))
+        g.add((key_uri, MLS["hasValue"], Literal(scores[key], datatype=XSD.double)))
         # TODO: The Example 1 puts hasValue directly in the ModelEvaluation
         # but that prevents to provide multiple values for 1 evaluation
         # http://ml-schema.github.io/documentation/ML%20Schema.html#overview
@@ -221,16 +213,15 @@ def get_run_metadata(scores, model_features, hyper_params, run_id=None):
     return g
 
 
-
-
-def retrieve_features(g, type='Both', run_id=None):
+def retrieve_features(g, type="Both", run_id=None):
     """Get features in the ML model
 
     :param type: type of the feature (Both, Drug, Disease)
     :return: JSON with features
     """
     if run_id:
-        sparql_feature_for_run = """PREFIX dct: <http://purl.org/dc/terms/>
+        sparql_feature_for_run = (
+            """PREFIX dct: <http://purl.org/dc/terms/>
             PREFIX mls: <http://www.w3.org/ns/mls#>
             PREFIX prov: <http://www.w3.org/ns/prov#>
             PREFIX openpredict: <https://w3id.org/openpredict/>
@@ -240,20 +231,22 @@ def retrieve_features(g, type='Both', run_id=None):
             SELECT DISTINCT ?feature ?featureId
             WHERE {
                 ?run a mls:Run ;
-                    dc:identifier \"""" + run_id + """\" ;
+                    dc:identifier \""""
+            + run_id
+            + """\" ;
                     mls:hasInput ?feature .
                 ?feature dc:identifier ?featureId .
             }"""
-            # <https://w3id.org/openpredict/embedding_type> ?embeddingType ;
-            #         dc:description ?featureDescription .
-        results = query_sparql_endpoint(sparql_feature_for_run, g, parameters=[
-                                        'feature', 'featureId'])
+        )
+        # <https://w3id.org/openpredict/embedding_type> ?embeddingType ;
+        #         dc:description ?featureDescription .
+        results = query_sparql_endpoint(sparql_feature_for_run, g, parameters=["feature", "featureId"])
         # print(results)
 
         features_json = {}
         for result in results:
-            features_json[result['feature']['value']] = {
-                "id": result['featureId']['value'],
+            features_json[result["feature"]["value"]] = {
+                "id": result["featureId"]["value"],
             }
 
     else:
@@ -267,15 +260,14 @@ def retrieve_features(g, type='Both', run_id=None):
                     <http://purl.org/dc/elements/1.1/identifier> ?id .
             }}
             """
-            # {type_filter} .format(type_filter=type_filter)
-        results = query_sparql_endpoint(
-            query, g, parameters=['id', 'feature'])
+        # {type_filter} .format(type_filter=type_filter)
+        results = query_sparql_endpoint(query, g, parameters=["id", "feature"])
         # print(results)
 
         features_json = {}
         for result in results:
-            features_json[result['feature']['value']] = {
-                "id": result['id']['value'],
+            features_json[result["feature"]["value"]] = {
+                "id": result["id"]["value"],
             }
     return features_json
 
@@ -323,25 +315,37 @@ def retrieve_models(g):
         }
         """
 
-    results = query_sparql_endpoint(sparql_get_scores, g,
-                                    parameters=['run', 'runId', 'generatedAtTime', 'featureId', 'accuracy',
-                                                'average_precision', 'f1', 'precision', 'recall', 'roc_auc'])
+    results = query_sparql_endpoint(
+        sparql_get_scores,
+        g,
+        parameters=[
+            "run",
+            "runId",
+            "generatedAtTime",
+            "featureId",
+            "accuracy",
+            "average_precision",
+            "f1",
+            "precision",
+            "recall",
+            "roc_auc",
+        ],
+    )
     models_json = {}
     for result in results:
-        if result['run']['value'] in models_json:
-            models_json[result['run']['value']]['features'].append(
-                result['featureId']['value'])
+        if result["run"]["value"] in models_json:
+            models_json[result["run"]["value"]]["features"].append(result["featureId"]["value"])
         else:
-            models_json[result['run']['value']] = {
-                "id": result['runId']['value'],
-                "generatedAtTime": result['generatedAtTime']['value'],
-                'features': [result['featureId']['value']],
-                'accuracy': result['accuracy']['value'],
-                'average_precision': result['average_precision']['value'],
-                'f1': result['f1']['value'],
-                'precision': result['precision']['value'],
-                'recall': result['recall']['value'],
-                'roc_auc': result['roc_auc']['value']
+            models_json[result["run"]["value"]] = {
+                "id": result["runId"]["value"],
+                "generatedAtTime": result["generatedAtTime"]["value"],
+                "features": [result["featureId"]["value"]],
+                "accuracy": result["accuracy"]["value"],
+                "average_precision": result["average_precision"]["value"],
+                "f1": result["f1"]["value"],
+                "precision": result["precision"]["value"],
+                "recall": result["recall"]["value"],
+                "roc_auc": result["roc_auc"]["value"],
             }
 
         # We could create an object with feature description instead of passing just the ID

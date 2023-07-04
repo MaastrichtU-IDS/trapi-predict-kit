@@ -11,7 +11,7 @@ from trapi_predict_kit.utils import log
 
 
 @dataclass
-class LoadedModel():
+class LoadedModel:
     path: str
     model: Any
     metadata: Graph
@@ -33,7 +33,7 @@ def save(
     # scores: Optional[Dict] = None,
     # hyper_params: Optional[Dict] = None,
 ) -> LoadedModel:
-    model_name = path.rsplit('/', 1)[-1]
+    model_name = path.rsplit("/", 1)[-1]
     # print(os.path.isabs(path))
     # if not os.path.isabs(path):
     #     path = os.path.join(os.getcwd(), path)
@@ -45,7 +45,7 @@ def save(
     mlem.save(model, path, sample_data=sample_data)
 
     g = get_run_metadata(scores, sample_data, hyper_params, model_name)
-    g.serialize(f"{path}.ttl", format='ttl')
+    g.serialize(f"{path}.ttl", format="ttl")
     # os.chmod(f"{path}.ttl", 0o644)
     # os.chmod(f"{path}.mlem", 0o644)
 
@@ -60,13 +60,12 @@ def save(
     )
 
 
-
 def load(path: str) -> LoadedModel:
     log.info(f"Loading model from {path}")
     model = mlem.load(path)
 
     g = Graph()
-    g.parse(f"{path}.ttl", format='ttl')
+    g.parse(f"{path}.ttl", format="ttl")
 
     # TODO: extract scores and hyper_params from RDF
 
