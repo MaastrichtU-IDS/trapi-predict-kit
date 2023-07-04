@@ -1,3 +1,7 @@
+# ---
+# dependencies:
+#   python.org: ^3.7
+# ---
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
