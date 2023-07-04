@@ -54,7 +54,8 @@ web = [
     "gunicorn >=20.0.4",
 ]
 train = [
-    "mlem >=0.4.0",
+    # "mlem >=0.4.0",
+    "mlem"
 ]
 test = [
     "pytest >=7.1.3",

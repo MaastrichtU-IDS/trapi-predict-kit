@@ -179,7 +179,6 @@ uvicorn trapi.main:app --port 8808 --reload
 
 The final section of the README is for if you want to run the package in development, and get involved by making a code contribution.
 
-
 ### 📥️ Clone
 
 Clone the repository:
@@ -188,6 +187,7 @@ Clone the repository:
 git clone https://github.com/MaastrichtU-IDS/trapi-predict-kit
 cd trapi-predict-kit
 ```
+
 ### 🐣 Install dependencies
 
 Install [Hatch](https://hatch.pypa.io), this will automatically handle virtual environments and make sure all dependencies are installed when you run a script in the project:
@@ -200,6 +200,12 @@ Install the dependencies in a local virtual environment:
 
 ```bash
 hatch -v env create
+```
+
+To test it locally with python 3.7 use mamba or conda:
+
+```bash
+mamba create -n py37 python=3.7
 ```
 
 ### 🧑‍💻 Develop
@@ -255,3 +261,8 @@ The deployment of new releases is done automatically by a GitHub Action workflow
 3. Create a new release on GitHub, which will automatically trigger the publish workflow, and publish the new release to PyPI.
 
 You can also manually trigger the workflow from the Actions tab in your GitHub repository webpage.
+
+# Dependencies
+| Project    | Version |
+| ---------- | ------- |
+| python.org | ^3.7    |
