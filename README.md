@@ -261,8 +261,3 @@ The deployment of new releases is done automatically by a GitHub Action workflow
 3. Create a new release on GitHub, which will automatically trigger the publish workflow, and publish the new release to PyPI.
 
 You can also manually trigger the workflow from the Actions tab in your GitHub repository webpage.
-
-# Dependencies
-| Project    | Version |
-| ---------- | ------- |
-| python.org | ^3.7.17 |
