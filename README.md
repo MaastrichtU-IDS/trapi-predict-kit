@@ -35,9 +35,9 @@ pip install trapi-predict-kit[web]
 
 ### 🔮 Define the prediction endpoint
 
-The `openpredict` package provides a decorator `@trapi_predict` to annotate your functions that generate predictions. Predictions generated from functions decorated with `@trapi_predict` can easily be imported in the Translator OpenPredict API, exposed as an API endpoint to get predictions from the web, and queried through the  Translator Reasoner API (TRAPI).
+The `trapi_predict_kit` package provides a decorator `@trapi_predict` to annotate your functions that generate predictions. Predictions generated from functions decorated with `@trapi_predict` can easily be imported in the Translator OpenPredict API, exposed as an API endpoint to get predictions from the web, and queried through the  Translator Reasoner API (TRAPI).
 
-The annotated predict functions are expected to take 2 input  arguments: the input ID (string) and options for the prediction  (dictionary). And it should return a dictionary with a list of predicted associated entities hits. Here is an example:
+The annotated predict functions are expected to take 2 input  arguments: the input ID (string) and options for the prediction (dictionary). And it should return a dictionary with a list of predicted associated entities hits. Here is an example:
 
  ```python
 from trapi_predict_kit import trapi_predict, PredictOptions, PredictOutput
