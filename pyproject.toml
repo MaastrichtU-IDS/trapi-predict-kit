@@ -78,26 +78,24 @@ features = [
     "train",
 ]
 post-install-commands = [
+    "pre-commit install",
 ]
 
 [tool.hatch.envs.default.scripts]
-test = "pytest {args}"
-cov = "test --cov src {args}"
 dev = "python tests/dev.py {args}"
 api = "uvicorn tests.dev:app --reload {args}"
 fmt = [
-    "black src tests",
-    "ruff src tests --fix",
+    "pre-commit run --all --all-files",
+    # "mypy",
 ]
-check = [
-    "ruff src tests",
-    "black src tests --check",
-    # "mypy src",
-]
-all = [
+test = [
     "fmt",
-    "check",
-    "cov",
+    "pytest {args}",
+]
+cov = [
+    "pytest --cov-report html {args}",
+    "python -c 'import webbrowser; webbrowser.open(\"http://0.0.0.0:3000\")'",
+    "python -m http.server 3000 --directory ./htmlcov",
 ]
 
 # TOOLS
@@ -129,6 +127,12 @@ disallow_any_generics = true
 
 
 [tool.pytest.ini_options]
+addopts = [
+    "-vvv",
+    "--cov=src",
+    "--color=yes",
+    "--cov-report=term-missing",
+]
 filterwarnings = [
     "ignore::DeprecationWarning:httpx.*:"
 ]
