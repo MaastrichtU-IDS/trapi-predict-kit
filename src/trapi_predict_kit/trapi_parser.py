@@ -306,11 +306,11 @@ def resolve_trapi_query(reasoner_query, endpoints_list):
                                     "analyses": [
                                         {
                                             "resource_id": "infores:openpredict",
+                                            "score": association_score,
+                                            "scoring_method": "Model confidence between 0 and 1",
                                             "edge_bindings": {edge_qg_id: [{"id": edge_kg_id}]},
                                         }
                                     ],
-                                    "score": association_score,
-                                    "scoring_method": "Model confidence between 0 and 1"
                                     # 'edge_bindings': {},
                                 }
                                 # result['edge_bindings'][edge_qg_id] = [
