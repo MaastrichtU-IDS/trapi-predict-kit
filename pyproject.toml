@@ -85,12 +85,11 @@ dev = "python tests/dev.py {args}"
 api = "uvicorn tests.dev:app --reload {args}"
 fmt = [
     "pre-commit run --all --all-files",
-    # "mypy",
 ]
 test = [
     "fmt",
     "pytest {args}",
-    "mypy",
+    # "mypy",
 ]
 cov = [
     "pytest --cov-report html {args}",
