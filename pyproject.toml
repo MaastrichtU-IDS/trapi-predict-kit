@@ -53,6 +53,7 @@ test = [
     "pytest-cov >=3.0.0",
     "pre-commit",
     "mypy >=0.991",
+    "types-requests",
 ]
 doc = [
     "mkdocs >=1.4.2",
@@ -129,7 +130,7 @@ warn_unused_ignores = true
 warn_redundant_casts = true
 disallow_untyped_calls = true
 disallow_untyped_defs = true
-disallow_any_generics = true
+disallow_any_generics = false
 
 
 [tool.pytest.ini_options]

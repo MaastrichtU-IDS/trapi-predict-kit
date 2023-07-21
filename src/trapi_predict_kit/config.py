@@ -1,10 +1,11 @@
 import os
+from typing import Optional
 
 from pydantic import BaseSettings
 
 
 class Settings(BaseSettings):
-    VIRTUAL_HOST: str = None
+    VIRTUAL_HOST: Optional[str] = None
     TIMEOUT: int = 30
 
     DEV_MODE: bool = False

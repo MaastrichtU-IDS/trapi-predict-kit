@@ -17,7 +17,7 @@ console_handler.setFormatter(formatter)
 log.addHandler(console_handler)
 
 
-def get_openpredict_dir(subfolder=""):
+def get_openpredict_dir(subfolder: str = "") -> str:
     """Return the full path to the provided files in the OpenPredict data folder
     Where models and features for runs are stored
     """
@@ -26,7 +26,7 @@ def get_openpredict_dir(subfolder=""):
     return settings.OPENPREDICT_DATA_DIR + subfolder
 
 
-def init_openpredict_dir():
+def init_openpredict_dir() -> None:
     """Create OpenPredict folder and initiate files if necessary."""
     if not os.path.exists(get_openpredict_dir("input/drugbank-drug-goa.csv")):
         raise ValueError(
