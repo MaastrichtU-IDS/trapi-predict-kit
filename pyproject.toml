@@ -59,6 +59,13 @@ test = [
     "pre-commit",
     "mypy >=0.991",
 ]
+doc = [
+    "mkdocs >=1.4.2",
+    "mkdocs-material >=8.2.7",
+    "mkdocstrings[python] >=0.19.1",
+    "mdx-include >=1.4.1",
+    "mkdocs-markdownextradata-plugin >=0.2.5",
+]
 
 
 [project.urls]
@@ -74,6 +81,7 @@ Source = "https://github.com/MaastrichtU-IDS/trapi-predict-kit"
 features = [
     "test",
     "web",
+    "doc",
     "train",
 ]
 post-install-commands = [
@@ -96,6 +104,7 @@ cov = [
     "python -c 'import webbrowser; webbrowser.open(\"http://0.0.0.0:3000\")'",
     "python -m http.server 3000 --directory ./htmlcov",
 ]
+docs = "mkdocs serve -a localhost:8001 {args}"
 
 # TOOLS
 [tool.hatch.version]
@@ -144,14 +153,14 @@ filterwarnings = [
 [tool.black]
 color = true
 line-length = 120
-target-version = ['py37']
+target-version = ['py38']
 skip-string-normalization = false
 
 
 # https://github.com/charliermarsh/ruff#supported-rules
 [tool.ruff]
 src = ["src", "tests"]
-target-version = "py37"
+target-version = "py38"
 line-length = 120
 select = [
     "A",
