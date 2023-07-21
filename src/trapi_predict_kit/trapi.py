@@ -158,7 +158,7 @@ You can also try this query to retrieve similar entities to a given drug:
             response_model=Query,
             tags=["reasoner"],
         )
-        def post_reasoner_predict(request_body: Query = Body(..., example=trapi_example)) -> Query:
+        def post_reasoner_predict(request_body: Query = Body(..., examples=[trapi_example])) -> Query:
             """Get predicted associations for a given ReasonerAPI query.
 
             :param request_body: The ReasonerStdAPI query in JSON

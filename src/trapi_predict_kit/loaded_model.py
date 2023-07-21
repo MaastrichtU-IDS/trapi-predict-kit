@@ -49,8 +49,6 @@ def save(
     # os.chmod(f"{path}.ttl", 0o644)
     # os.chmod(f"{path}.mlem", 0o644)
 
-    # TODO: generate and store RDF metadata
-    # return path
     return LoadedModel(
         path=path,
         model=model,
