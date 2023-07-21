@@ -102,6 +102,9 @@ cov = [
 [tool.hatch.version]
 path = "src/trapi_predict_kit/__init__.py"
 
+# [tool.hatch.metadata]
+# allow-direct-references = true
+
 
 [tool.coverage.run]
 source = ["src"]

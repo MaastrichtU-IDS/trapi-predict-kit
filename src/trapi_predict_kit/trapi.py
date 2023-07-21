@@ -1,3 +1,4 @@
+import os
 import time
 from typing import Any, Callable, Dict, List, Optional
 
@@ -27,7 +28,9 @@ class TRAPI(FastAPI):
         self,
         *args: Any,
         predict_endpoints: List[Callable],
-        servers: Optional[List[Dict[str, str]]] = None,
+        ordered_servers: Optional[List[Dict[str, str]]] = None,
+        itrb_url_prefix: Optional[str] = None,
+        dev_server_url: Optional[str] = None,
         info: Optional[Dict[str, Any]] = None,
         title="Translator Reasoner API",
         version="1.0.0",
@@ -45,9 +48,52 @@ class TRAPI(FastAPI):
             root_path_in_servers=False,
             **kwargs,
         )
-        self.servers = servers
         self.predict_endpoints = predict_endpoints
         self.info = info
+
+        # On ITRB deployment and local dev we directly use the current server
+        self.servers = []
+
+        # For the API deployed on our server and registered to SmartAPI we provide the complete list
+        if os.getenv("VIRTUAL_HOST"):
+            if itrb_url_prefix:
+                self.servers.append(
+                    {
+                        "url": f"https://{itrb_url_prefix}.transltr.io",
+                        "description": "TRAPI ITRB Production Server",
+                        "x-maturity": "production",
+                    }
+                )
+                self.servers.append(
+                    {
+                        "url": f"https://{itrb_url_prefix}.test.transltr.io",
+                        "description": "TRAPI ITRB Test Server",
+                        "x-maturity": "testing",
+                    }
+                )
+                self.servers.append(
+                    {
+                        "url": f"https://{itrb_url_prefix}.ci.transltr.io",
+                        "description": "TRAPI ITRB CI Server",
+                        "x-maturity": "staging",
+                    }
+                )
+            if dev_server_url:
+                self.servers.append(
+                    {"url": dev_server_url, "description": "TRAPI Dev Server", "x-maturity": "development"}
+                )
+
+            ordered_servers = []
+            # Add the current server as 1st server in the list
+            for server in self.servers:
+                if os.getenv("VIRTUAL_HOST") in server["url"]:
+                    ordered_servers.append(server)
+                    break
+            # Add other servers
+            for server in self.servers:
+                if os.getenv("VIRTUAL_HOST") not in server["url"]:
+                    ordered_servers.append(server)
+            self.servers = ordered_servers
 
         self.add_middleware(
             CORSMiddleware,
