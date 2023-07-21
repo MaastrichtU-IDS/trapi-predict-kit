@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🪄 TRAPI Predict Kit
+# 🧰 TRAPI Predict Kit
 
 [![PyPI - Version](https://img.shields.io/pypi/v/trapi-predict-kit.svg?logo=pypi&label=PyPI&logoColor=silver)](https://pypi.org/project/trapi-predict-kit/)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/trapi-predict-kit.svg?logo=python&label=Python&logoColor=silver)](https://pypi.org/project/trapi-predict-kit/)
