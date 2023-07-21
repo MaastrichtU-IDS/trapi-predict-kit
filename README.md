@@ -2,13 +2,10 @@
 
 # 🪄 TRAPI Predict Kit
 
-<!--
-
 [![PyPI - Version](https://img.shields.io/pypi/v/trapi-predict-kit.svg?logo=pypi&label=PyPI&logoColor=silver)](https://pypi.org/project/trapi-predict-kit/)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/trapi-predict-kit.svg?logo=python&label=Python&logoColor=silver)](https://pypi.org/project/trapi-predict-kit/)
 [![license](https://img.shields.io/pypi/l/trapi-predict-kit.svg?color=%2334D058)](https://github.com/MaastrichtU-IDS/trapi-predict-kit/blob/main/LICENSE.txt)
 [![code style - black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
--->
 
 [![Test package](https://github.com/MaastrichtU-IDS/trapi-predict-kit/actions/workflows/test.yml/badge.svg)](https://github.com/MaastrichtU-IDS/trapi-predict-kit/actions/workflows/test.yml)
 [![Publish package](https://github.com/MaastrichtU-IDS/trapi-predict-kit/actions/workflows/publish.yml/badge.svg)](https://github.com/MaastrichtU-IDS/trapi-predict-kit/actions/workflows/publish.yml)
@@ -25,7 +22,7 @@ The **TRAPI Predict Kit** helps data scientists to build, and **publish predicti
 
 Predictions are usually generated from machine learning models (e.g. predict disease treated by drug), but it can adapt to generic python function, as long as the input params and return object follow the expected structure.
 
-Checkout the documentation website at **[maastrichtu-ids.github.io/translator-openpredict](https://maastrichtu-ids.github.io/translator-openpredict)** for more details.
+Checkout the documentation website at **[maastrichtu-ids.github.io/trapi-predict-kit](https://maastrichtu-ids.github.io/trapi-predict-kit)** for more details.
 
 ## 📦️ Installation
 
