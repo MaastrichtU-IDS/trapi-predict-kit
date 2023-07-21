@@ -4,4 +4,4 @@ from .predict_output import PredictHit, PredictOptions, PredictOutput, TrainingO
 from .trapi import TRAPI
 from .config import settings
 
-__version__ = "0.1.1"
+__version__ = "0.1.2"
