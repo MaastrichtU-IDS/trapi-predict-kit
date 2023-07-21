@@ -56,9 +56,8 @@ train = [
 test = [
     "pytest >=7.1.3",
     "pytest-cov >=3.0.0",
-    "ruff >=0.0.219",
+    "pre-commit >=3.3.0",
     "mypy >=0.991",
-    "black >= 22.8.0",
 ]
 
 

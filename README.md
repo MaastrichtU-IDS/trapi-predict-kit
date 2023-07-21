@@ -17,6 +17,16 @@
 
 A package to help create and deploy Translator Reasoner APIs (TRAPI) from any prediction model exposed as a regular python function.
 
+The **TRAPI Predict Kit** helps data scientists to build, and **publish prediction models** in a [FAIR](https://www.go-fair.org/fair-principles/) and reproducible manner. It provides helpers for various steps of the process:
+
+* A template to help user quickly bootstrap a new prediction project with the recommended structure ([MaastrichtU-IDS/cookiecutter-openpredict-api](https://github.com/MaastrichtU-IDS/cookiecutter-openpredict-api/))
+* Helper function to easily save a generated model, its metadata, and the data used to generate it. It uses tools such as [`dvc`](https://dvc.org/) and [`mlem`](https://mlem.ai/) to store large model outside of the git repository.
+* Deploy API endpoints for retrieving predictions, which comply with the NCATS Biomedical Data Translator standards ([Translator Reasoner API](https://github.com/NCATSTranslator/ReasonerAPI) and [BioLink model](https://github.com/biolink/biolink-model)), using a decorator `@trapi_predict` to simply annotate the function that produces predicted associations for a given input entity
+
+Predictions are usually generated from machine learning models (e.g. predict disease treated by drug), but it can adapt to generic python function, as long as the input params and return object follow the expected structure.
+
+Checkout the documentation website at **[maastrichtu-ids.github.io/translator-openpredict](https://maastrichtu-ids.github.io/translator-openpredict)** for more details.
+
 ## 📦️ Installation
 
 This package requires Python >=3.7, simply install it with:
@@ -33,7 +43,18 @@ pip install trapi-predict-kit[web]
 
 ## 🪄 Usage
 
-### 🔮 Define the prediction endpoint
+### 🍪 Start a new prediction project
+
+A template to help user quickly bootstrap a new prediction project with the recommended structure ([MaastrichtU-IDS/cookiecutter-openpredict-api](https://github.com/MaastrichtU-IDS/cookiecutter-openpredict-api/))
+
+You can use [**our cookiecutter template**](https://github.com/MaastrichtU-IDS/cookiecutter-openpredict-api/) to quickly bootstrap a repository with everything ready to start developing your prediction models, to then easily publish, and integrate them in the Translator ecosystem
+
+```bash
+pip install cookiecutter
+cookiecutter https://github.com/MaastrichtU-IDS/cookiecutter-openpredict-api
+```
+
+### 🔮 Define the prediction endpoint(s)
 
 The `trapi_predict_kit` package provides a decorator `@trapi_predict` to annotate your functions that generate predictions. Predictions generated from functions decorated with `@trapi_predict` can easily be imported in the Translator OpenPredict API, exposed as an API endpoint to get predictions from the web, and queried through the  Translator Reasoner API (TRAPI).
 
@@ -88,7 +109,7 @@ def get_predictions(
     return predictions
  ```
 
-### Define the API
+### Define the TRAPI object
 
 You will need to instantiate a `TRAPI` class to deploy a Translator Reasoner API serving a list of prediction functions that have been decorated with `@trapi_predict`. For example:
 
@@ -104,8 +125,6 @@ log_level = logging.ERROR
 if settings.DEV_MODE:
     log_level = logging.INFO
 logging.basicConfig(level=log_level)
-
-predict_endpoints = [ get_predictions ]
 
 openapi_info = {
     "contact": {
@@ -144,26 +163,16 @@ openapi_info = {
     }
 }
 
-servers = []
-if settings.VIRTUAL_HOST:
-    servers = [
-        {
-            "url": f"https://{settings.VIRTUAL_HOST}",
-            "description": 'TRAPI ITRB Production Server',
-            "x-maturity": 'production'
-        },
-    ]
-
 app = TRAPI(
-    predict_endpoints=predict_endpoints,
-    servers=servers,
+    predict_endpoints=[ get_predictions ],
     info=openapi_info,
-    title='My model TRAPI',
+    title='OpenPredict TRAPI',
     version='1.0.0',
     openapi_version='3.0.1',
     description="""Machine learning models to produce predictions that can be integrated to Translator Reasoner APIs.
 \n\nService supported by the [NCATS Translator project](https://ncats.nih.gov/translator/about)""",
-    dev_mode=True,
+    itrb_url_prefix="openpredict",
+    dev_server_url="https://openpredict.semanticscience.org",
 )
 ```
 
@@ -173,6 +182,30 @@ Change `trapi.main` to your module path in the command before running it:
 
 ```bash
 uvicorn trapi.main:app --port 8808 --reload
+```
+
+### 💾 Save a generated model
+
+Helper function to easily save a generated model, its metadata, and the data used to generate it. It uses tools such as [`dvc`](https://dvc.org/) and [`mlem`](https://mlem.ai/) to store large model outside of the git repository.
+
+```python
+from trapi_predict_kit import save
+
+hyper_params = {
+    'penalty': 'l2',
+    'dual': False,
+    'tol': 0.0001,
+    'C': 1.0,
+    'random_state': 100
+}
+
+saved_model = save(
+    model=clf,
+    path="models/my_model",
+    sample_data=sample_data,
+    hyper_params=hyper_params,
+    scores=scores,
+)
 ```
 
 ## 🧑‍💻 Development setup
