@@ -49,10 +49,6 @@ jobs:
       run: |
         pip install hatch
 
-    - name: Check with ruff and mypy
-      run: |
-        hatch run check
-
     - name: Test with coverage
       run: |
-        hatch run cov --cov-report xml:coverage.xml
+        hatch run test

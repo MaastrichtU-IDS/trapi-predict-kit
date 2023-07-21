@@ -90,6 +90,7 @@ fmt = [
 test = [
     "fmt",
     "pytest {args}",
+    "mypy",
 ]
 cov = [
     "pytest --cov-report html {args}",
@@ -114,6 +115,7 @@ omit = ["tests/*"]
 
 
 [tool.mypy]
+files = ["src/"]
 strict = true
 implicit_reexport = true
 follow_imports = "normal"
