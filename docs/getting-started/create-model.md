@@ -76,7 +76,7 @@ def get_predictions(
     predictions = {
         "hits": [
             {
-                "id": "DB00001",
+                "id": "drugbank:DB00001",
                 "type": "biolink:Drug",
                 "score": 0.12345,
                 "label": "Leipirudin",
