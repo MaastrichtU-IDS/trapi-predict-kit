@@ -19,7 +19,7 @@ log.addHandler(console_handler)
 
 def resolve_entities(label: str) -> dict:
     """Use Translator SRI Name Resolution API to get the preferred Translator ID"""
-    resp = requests.get(
+    resp = requests.post(
         "https://name-resolution-sri.renci.org/lookup",
         params={"string": label, "limit": 3},
         timeout=settings.TIMEOUT,
