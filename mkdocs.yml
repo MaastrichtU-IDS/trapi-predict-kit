@@ -11,8 +11,8 @@ nav:
   - Getting started:
     - Getting started: index.md
     - Creating a project: getting-started/create-project.md
-    - Creating a prediction model: getting-started/create-model.md
-    - Deploying the API: getting-started/deploy-api.md
+    - Exposing a prediction model: getting-started/expose-model.md
+    - Saving a model: getting-started/save-model.md
     # - Development: getting-started/development.md
 
   - OpenPredict API:

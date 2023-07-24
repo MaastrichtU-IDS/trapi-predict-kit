@@ -1,3 +1,6 @@
+You can bootstrap a ready-to-use project using [our template](https://github.com/MaastrichtU-IDS/cookiecutter-trapi-predict-kit), it will generate all required files to get started with an example training and prediction workflow that you can then replace with your code.
+
+Otherwise skip directly to the next page to learn how to integrate and expose a model through TRAPI.
 
 ## 🍪 Start a new prediction project
 
