@@ -27,7 +27,7 @@ def resolve_entities(label: str) -> dict:
     return resp.json()
 
 
-def normalize_id_to_translator(ids_list: list(str)) -> dict:
+def normalize_id_to_translator(ids_list: list[str]) -> dict:
     """Use Translator SRI NodeNormalization API to get the preferred Translator ID
     for an ID https://nodenormalization-sri.renci.org/docs
     """
