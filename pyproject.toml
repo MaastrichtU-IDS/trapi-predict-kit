@@ -187,6 +187,7 @@ ignore = [
     "B006", # do not use mutable data structures for argument defaults
     "C901", # too complex
     "S101", # Use of `assert` detected
+    "S301", # `pickle` and modules that wrap it can be unsafe
     "T201", "T203", # remove print and pprint
     "S105", # Potential password
     "PLR0913", "PLR0912", "PLR0915", # Too many branches/statements/arguments to function call
