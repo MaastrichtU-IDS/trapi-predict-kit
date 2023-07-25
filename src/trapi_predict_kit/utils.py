@@ -1,8 +1,12 @@
 import logging
+import uuid
+from datetime import datetime
 from itertools import zip_longest
 from typing import List
 
 import requests
+from rdflib import RDF, Graph, Literal, Namespace, URIRef
+from rdflib.namespace import DC, RDFS, XSD
 
 from trapi_predict_kit.config import settings
 
@@ -92,25 +96,104 @@ def get_entities_labels(entity_list):
     return label_results
 
 
-def get_openpredict_dir(subfolder: str = "") -> str:
-    """Return the full path to the provided files in the OpenPredict data folder
-    Where models and features for runs are stored
-    """
-    if not settings.OPENPREDICT_DATA_DIR.endswith("/"):
-        settings.OPENPREDICT_DATA_DIR += "/"
-    return settings.OPENPREDICT_DATA_DIR + subfolder
-
-
-# def init_openpredict_dir() -> None:
-#     """Create OpenPredict folder and initiate files if necessary."""
-#     if not os.path.exists(get_openpredict_dir("input/drugbank-drug-goa.csv")):
-#         raise ValueError(
-#             "❌ The data required to run the prediction models could not be found in the `data` folder"
-#             "i️ Use `pip install dvc` and `dvc pull` to pull the data easily"
-#         )
-
-
 def split_list(iterable, n, fillvalue=None):
     "Collect data into fixed-length chunks or blocks"
     args = [iter(iterable)] * n
     return zip_longest(*args, fillvalue=fillvalue)
+
+
+OPENPREDICT_GRAPH = "https://w3id.org/openpredict/graph"
+OPENPREDICT_NAMESPACE = "https://w3id.org/openpredict/"
+BIOLINK = Namespace("https://w3id.org/biolink/vocab/")
+
+OWL = Namespace("http://www.w3.org/2002/07/owl#")
+SKOS = Namespace("http://www.w3.org/2004/02/skos/core#")
+SCHEMA = Namespace("http://schema.org/")
+DCAT = Namespace("http://www.w3.org/ns/dcat#")
+PROV = Namespace("http://www.w3.org/ns/prov#")
+MLS = Namespace("http://www.w3.org/ns/mls#")
+OPENPREDICT = Namespace("https://w3id.org/openpredict/")
+
+
+def get_run_metadata(scores, model_features, hyper_params, run_id=None):
+    """Generate RDF metadata for a classifier and save it in data/openpredict-metadata.ttl, based on OpenPredict model:
+    https://github.com/fair-workflows/openpredict/blob/master/data/rdf/results_disjoint_lr.nq
+
+    :param scores: scores
+    :param model_features: List of features in the model
+    :param label: label of the classifier
+    :return: Run id
+    """
+    g = Graph()
+    g.bind("mls", Namespace("http://www.w3.org/ns/mls#"))
+    g.bind("prov", Namespace("http://www.w3.org/ns/prov#"))
+    g.bind("dc", Namespace("http://purl.org/dc/elements/1.1/"))
+    g.bind("openpredict", Namespace("https://w3id.org/openpredict/"))
+
+    if not run_id:
+        # Generate random UUID for the run ID
+        run_id = str(uuid.uuid1())
+
+    run_uri = URIRef(OPENPREDICT_NAMESPACE + "run/" + run_id)
+    run_prop_prefix = OPENPREDICT_NAMESPACE + run_id + "/"
+    evaluation_uri = URIRef(OPENPREDICT_NAMESPACE + "run/" + run_id + "/ModelEvaluation")
+    # The same for all run:
+    implementation_uri = URIRef(OPENPREDICT_NAMESPACE + "implementation/OpenPredict")
+
+    # Add Run metadata
+    g.add((run_uri, RDF.type, MLS["Run"]))
+    g.add((run_uri, DC.identifier, Literal(run_id)))
+    g.add((run_uri, PROV["generatedAtTime"], Literal(datetime.now(), datatype=XSD.dateTime)))
+    g.add((run_uri, MLS["realizes"], OPENPREDICT["LogisticRegression"]))
+    g.add((run_uri, MLS["executes"], implementation_uri))
+    g.add((run_uri, MLS["hasOutput"], evaluation_uri))
+    g.add((run_uri, MLS["hasOutput"], URIRef(run_prop_prefix + "Model")))
+
+    # Add Model, should we point it to the generated model?
+    g.add((URIRef(run_prop_prefix + "Model"), RDF.type, MLS["Model"]))
+
+    # Add implementation metadata
+    g.add((OPENPREDICT["LogisticRegression"], RDF.type, MLS["Algorithm"]))
+    g.add((implementation_uri, RDF.type, MLS["Implementation"]))
+    g.add((implementation_uri, MLS["implements"], OPENPREDICT["LogisticRegression"]))
+
+    # Add HyperParameters and their settings to implementation
+    for hyperparam, hyperparam_setting in hyper_params.items():
+        hyperparam_uri = URIRef(OPENPREDICT_NAMESPACE + "HyperParameter/" + hyperparam)
+        g.add((implementation_uri, MLS["hasHyperParameter"], hyperparam_uri))
+        g.add((hyperparam_uri, RDF.type, MLS["HyperParameter"]))
+        g.add((hyperparam_uri, RDFS.label, Literal(hyperparam)))
+
+        hyperparam_setting_uri = URIRef(OPENPREDICT_NAMESPACE + "HyperParameterSetting/" + hyperparam)
+        g.add((implementation_uri, MLS["hasHyperParameter"], hyperparam_setting_uri))
+        g.add((hyperparam_setting_uri, RDF.type, MLS["HyperParameterSetting"]))
+        g.add((hyperparam_setting_uri, MLS["specifiedBy"], hyperparam_uri))
+        g.add((hyperparam_setting_uri, MLS["hasValue"], Literal(hyperparam_setting)))
+        g.add((run_uri, MLS["hasInput"], hyperparam_setting_uri))
+
+    # TODO: improve how we retrieve features
+    for feature in model_features:
+        feature_uri = URIRef(
+            OPENPREDICT_NAMESPACE + "feature/" + feature.replace(" ", "_").replace("(", "").replace(")", "")
+        )
+        g.add((feature_uri, RDF.type, MLS["Feature"]))
+        g.add((feature_uri, DC.identifier, Literal(feature)))
+        g.add((run_uri, MLS["hasInput"], feature_uri))
+
+    # TODO: those 2 triples are for the PLEX ontology
+    g.add((evaluation_uri, RDF.type, PROV["Entity"]))
+    g.add((evaluation_uri, PROV["wasGeneratedBy"], run_uri))
+
+    # Add scores as EvaluationMeasures
+    g.add((evaluation_uri, RDF.type, MLS["ModelEvaluation"]))
+    for key in scores:
+        key_uri = URIRef(run_prop_prefix + key)
+        g.add((evaluation_uri, MLS["specifiedBy"], key_uri))
+        g.add((key_uri, RDF.type, MLS["EvaluationMeasure"]))
+        g.add((key_uri, RDFS.label, Literal(key)))
+        g.add((key_uri, MLS["hasValue"], Literal(scores[key], datatype=XSD.double)))
+        # TODO: The Example 1 puts hasValue directly in the ModelEvaluation
+        # but that prevents to provide multiple values for 1 evaluation
+        # http://ml-schema.github.io/documentation/ML%20Schema.html#overview
+
+    return g

@@ -1,4 +1,5 @@
 import json
+import os
 
 from fastapi.testclient import TestClient
 
@@ -6,6 +7,7 @@ from trapi_predict_kit import TRAPI, settings
 
 from .test_decorator import get_predictions
 
+os.environ["VIRTUAL_HOST"] = "openpredict.semanticscience.org"
 openapi_info = {
     "contact": {
         "name": "Firstname Lastname",
@@ -53,22 +55,7 @@ app = TRAPI(
     itrb_url_prefix="openpredict",
     dev_server_url="https://openpredict.semanticscience.org",
 )
-
 client = TestClient(app)
-
-
-trapi_query = {
-    "message": {
-        "query_graph": {
-            "edges": {"e01": {"subject": "n0", "object": "n1", "predicates": ["biolink:treats"]}},
-            "nodes": {
-                "n0": {"categories": ["biolink:Drug"]},
-                "n1": {"ids": ["OMIM:246300"], "categories": ["biolink:Disease"]},
-            },
-        }
-    },
-    "query_options": {"n_results": 3},
-}
 
 
 def test_get_predict_drug():
@@ -80,22 +67,44 @@ def test_get_predict_drug():
     assert response["hits"][0]["id"] == "drugbank:DB00001"
 
 
+def test_get_meta_kg():
+    """Get the metakg"""
+    url = "/meta_knowledge_graph"
+    response = client.get(url).json()
+    assert len(response["edges"]) >= 1
+    assert len(response["nodes"]) >= 1
+
+
 def test_post_trapi():
     """Test Translator ReasonerAPI query POST operation to get predictions"""
-    url = "/query"
+    trapi_query = {
+        "message": {
+            "query_graph": {
+                "edges": {"e01": {"subject": "n0", "object": "n1", "predicates": ["biolink:treats"]}},
+                "nodes": {
+                    "n0": {"categories": ["biolink:Drug"]},
+                    "n1": {"ids": ["OMIM:246300"], "categories": ["biolink:Disease"]},
+                },
+            }
+        },
+        "query_options": {
+            "n_results": 3,
+            "min_score": 0,
+            "max_score": 1,
+        },
+    }
     response = client.post(
-        url,
+        "/query",
         data=json.dumps(trapi_query),
         headers={"Content-Type": "application/json"},
-        # content_type='application/json'
     )
-    print(response.json())
+    # print(response.json())
     edges = response.json()["message"]["knowledge_graph"]["edges"].items()
     assert len(edges) == 1
 
 
 def test_trapi_empty_response():
-    empty_query = {
+    trapi_query = {
         "message": {
             "query_graph": {
                 "edges": {
@@ -105,18 +114,9 @@ def test_trapi_empty_response():
             }
         }
     }
-
     response = client.post(
         "/query",
-        data=json.dumps(empty_query),
+        data=json.dumps(trapi_query),
         headers={"Content-Type": "application/json"},
-        # content_type='application/json'
     )
-
-    # validator.check_compliance_of_trapi_response(response.json())
-    # validator_resp = validator.get_messages()
-    # print(validator_resp["warnings"])
-    # assert (
-    #     len(validator_resp["errors"]) == 0
-    # )
     assert len(response.json()["message"]["results"]) == 0

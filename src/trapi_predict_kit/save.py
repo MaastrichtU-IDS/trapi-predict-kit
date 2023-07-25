@@ -7,8 +7,7 @@ from mlem import api as mlem
 from rdflib import Graph
 
 # from mlem.api import save as mlem_save, load as mlem_load
-from trapi_predict_kit.rdf_utils import get_run_metadata
-from trapi_predict_kit.utils import log
+from trapi_predict_kit.utils import get_run_metadata, log
 
 
 @dataclass

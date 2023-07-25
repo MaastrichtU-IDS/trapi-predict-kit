@@ -7,8 +7,6 @@ from trapi_predict_kit.config import settings
 # Script to use to try the package in development
 
 # Setup logger
-
-
 log_level = logging.ERROR
 if settings.DEV_MODE:
     log_level = logging.INFO
