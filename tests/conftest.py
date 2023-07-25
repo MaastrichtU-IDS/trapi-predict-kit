@@ -1,16 +1,14 @@
 import logging
+import os
 from typing import Optional
 
 from trapi_predict_kit import TRAPI, PredictOptions, PredictOutput, trapi_predict
 from trapi_predict_kit.config import settings
 
-# Script to use to try the package in development
-
 # Setup logger
-log_level = logging.ERROR
-if settings.DEV_MODE:
-    log_level = logging.INFO
+log_level = logging.INFO
 logging.basicConfig(level=log_level)
+os.environ["VIRTUAL_HOST"] = "openpredict.semanticscience.org"
 
 
 # Define additional metadata to integrate this function in TRAPI
@@ -34,19 +32,12 @@ logging.basicConfig(level=log_level)
     nodes={"biolink:Disease": {"id_prefixes": ["OMIM"]}, "biolink:Drug": {"id_prefixes": ["DRUGBANK"]}},
 )
 def get_predictions(input_id: str, options: Optional[PredictOptions] = None) -> PredictOutput:
-    # You can easily load previously stored models
-    # loaded_model = load("models/{{cookiecutter.module_name}}")
-    # print(loaded_model.model)
-
-    # Add the code to generate predicted associations for the provided input
-    # loaded_model.model.predict_proba(x)
-
     # Predictions results should be a list of entities
     # for which there is a predicted association with the input entity
     predictions = {
         "hits": [
             {
-                "id": "DB00001",
+                "id": "drugbank:DB00001",
                 "type": "biolink:Drug",
                 "score": 0.12345,
                 "label": "Leipirudin",
@@ -56,8 +47,6 @@ def get_predictions(input_id: str, options: Optional[PredictOptions] = None) -> 
     }
     return predictions
 
-
-predict_endpoints = [get_predictions]
 
 openapi_info = {
     "contact": {
@@ -96,7 +85,7 @@ openapi_info = {
 }
 
 app = TRAPI(
-    predict_endpoints=predict_endpoints,
+    predict_endpoints=[get_predictions],
     info=openapi_info,
     title="TRAPI predict kit dev",
     version="1.0.0",
@@ -106,11 +95,3 @@ app = TRAPI(
     itrb_url_prefix="openpredict",
     dev_server_url="https://openpredict.semanticscience.org",
 )
-
-
-if __name__ == "__main__":
-    # To be run when the script is executed directly
-    input_id = "drugbank:DB00002"
-    # if len(sys.argv) > 0:
-    #     input_id = sys.argv[1]
-    print(get_predictions(input_id, PredictOptions()))

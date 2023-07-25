@@ -3,7 +3,7 @@ from typing import Any, Callable, Dict, List, Optional
 
 from reasoner_pydantic import MetaEdge, MetaNode
 
-from trapi_predict_kit.predict_output import PredictOptions
+from trapi_predict_kit.types import PredictOptions
 
 
 def trapi_predict(

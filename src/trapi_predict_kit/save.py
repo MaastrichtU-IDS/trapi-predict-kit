@@ -42,7 +42,6 @@ def save(
 
     # mlem_model = MlemModel.from_obj(model, sample_data=sample_data)
     # mlem_model.dump(path)
-    # print(mlem_model)
     if method == "mlem":
         mlem.save(model, path, sample_data=sample_data)
     else:

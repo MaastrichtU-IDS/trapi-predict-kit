@@ -43,7 +43,6 @@ def normalize_id_to_translator(ids_list: List[str]) -> dict:
     )
     # Get corresponding OMIM IDs for MONDO IDs if match
     resp = resolve_curies.json()
-    # print(resp)
     for converted_id, translator_ids in resp.items():
         try:
             pref_id = translator_ids["id"]["identifier"]
@@ -51,7 +50,6 @@ def normalize_id_to_translator(ids_list: List[str]) -> dict:
             converted_ids_obj[converted_id] = pref_id
         except Exception:
             log.error("❌️ " + converted_id + " > " + str(translator_ids))
-
     return converted_ids_obj
 
 
@@ -87,7 +85,6 @@ def get_entities_labels(entity_list):
                 timeout=settings.TIMEOUT,
             )
             label_results.update(get_label_result.json())
-            # print(f"get_entities_labels {get_label_result}")
         except Exception as e:
             # Catch if the call to the API fails (API not available)
             logging.warn(

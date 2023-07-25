@@ -118,9 +118,7 @@ from trapi_predict_kit import TRAPI
 # TODO: change to your module name
 from my_model.predict import get_predictions
 
-log_level = logging.ERROR
-if settings.DEV_MODE:
-    log_level = logging.INFO
+log_level = logging.INFO
 logging.basicConfig(level=log_level)
 
 openapi_info = {

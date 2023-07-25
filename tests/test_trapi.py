@@ -1,60 +1,9 @@
 import json
-import os
 
 from fastapi.testclient import TestClient
 
-from trapi_predict_kit import TRAPI, settings
+from .conftest import app
 
-from .test_decorator import get_predictions
-
-os.environ["VIRTUAL_HOST"] = "openpredict.semanticscience.org"
-openapi_info = {
-    "contact": {
-        "name": "Firstname Lastname",
-        "email": "email@example.com",
-        # "x-id": "https://orcid.org/0000-0000-0000-0000",
-        "x-role": "responsible developer",
-    },
-    "license": {
-        "name": "MIT license",
-        "url": "https://opensource.org/licenses/MIT",
-    },
-    "termsOfService": "https://github.com/your-org-or-username/my-model/blob/main/LICENSE.txt",
-    "x-translator": {
-        "component": "KP",
-        # TODO: update the Translator team to yours
-        "team": ["Clinical Data Provider"],
-        "biolink-version": settings.BIOLINK_VERSION,
-        "infores": "infores:openpredict",
-        "externalDocs": {
-            "description": "The values for component and team are restricted according to this external JSON schema. See schema and examples at url",
-            "url": "https://github.com/NCATSTranslator/translator_extensions/blob/production/x-translator/",
-        },
-    },
-    "x-trapi": {
-        "version": settings.TRAPI_VERSION,
-        "asyncquery": False,
-        "operations": [
-            "lookup",
-        ],
-        "externalDocs": {
-            "description": "The values for version are restricted according to the regex in this external JSON schema. See schema and examples at url",
-            "url": "https://github.com/NCATSTranslator/translator_extensions/blob/production/x-trapi/",
-        },
-    },
-}
-
-app = TRAPI(
-    predict_endpoints=[get_predictions],
-    info=openapi_info,
-    title="OpenPredict TRAPI",
-    version="1.0.0",
-    openapi_version="3.0.1",
-    description="""Machine learning models to produce predictions that can be integrated to Translator Reasoner APIs.
-\n\nService supported by the [NCATS Translator project](https://ncats.nih.gov/translator/about)""",
-    itrb_url_prefix="openpredict",
-    dev_server_url="https://openpredict.semanticscience.org",
-)
 client = TestClient(app)
 
 
@@ -98,7 +47,6 @@ def test_post_trapi():
         data=json.dumps(trapi_query),
         headers={"Content-Type": "application/json"},
     )
-    # print(response.json())
     edges = response.json()["message"]["knowledge_graph"]["edges"].items()
     assert len(edges) == 1
 
@@ -120,3 +68,13 @@ def test_trapi_empty_response():
         headers={"Content-Type": "application/json"},
     )
     assert len(response.json()["message"]["results"]) == 0
+
+
+def test_healthcheck():
+    response = client.get("/health")
+    assert response.json() == {"status": "ok"}
+
+
+def test_root_redirect():
+    response = client.get("/")
+    assert response.status_code == 200

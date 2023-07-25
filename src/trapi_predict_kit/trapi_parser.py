@@ -3,7 +3,7 @@ import re
 import requests
 
 from trapi_predict_kit.config import settings
-from trapi_predict_kit.utils import get_entities_labels
+from trapi_predict_kit.utils import get_entities_labels, log
 
 # TODO: add evidence path to TRAPI
 
@@ -25,7 +25,7 @@ def get_biolink_parents(concept):
         resp.append(concept)
         return resp
     except Exception as e:
-        print(f"Error querying {query_url}, using the original IDs: {e}")
+        log.warn(f"Error querying {query_url}, using the original IDs: {e}")
         return [concept]
 
 
@@ -59,8 +59,8 @@ def resolve_ids_with_nodenormalization_api(resolve_ids_list, resolved_ids_object
                         resolved_ids_list.append(main_id)
                         resolved_ids_object[main_id] = resolved_id
         except Exception:
-            print("Error querying the NodeNormalization API, using the original IDs")
-    # print(f"Resolved: {resolve_ids_list} to {resolved_ids_object}")
+            log.warn("Error querying the NodeNormalization API, using the original IDs")
+    # log.info(f"Resolved: {resolve_ids_list} to {resolved_ids_object}")
     return resolved_ids_list, resolved_ids_object
 
 
@@ -178,7 +178,7 @@ def resolve_trapi_query(reasoner_query, endpoints_list):
                         if id_to_predict in labels_dict:
                             label_to_predict = labels_dict[id_to_predict]["id"]["label"]
                         try:
-                            print(f"🔮⏳️ Getting predictions for: {id_to_predict}")
+                            log.info(f"🔮⏳️ Getting predictions for: {id_to_predict}")
                             # Run function to get predictions
                             prediction_results = predict_func(
                                 id_to_predict,
@@ -193,10 +193,7 @@ def resolve_trapi_query(reasoner_query, endpoints_list):
                             )
                             prediction_json = prediction_results["hits"]
                         except Exception as e:
-                            print(f"Error getting the predictions: {e}")
-                            import traceback
-
-                            print(traceback.format_exc())
+                            log.error(f"Error getting the predictions: {e}")
                             prediction_json = []
 
                         for association in prediction_json:

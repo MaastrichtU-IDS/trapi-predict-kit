@@ -7,9 +7,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, RedirectResponse
 from reasoner_pydantic import Query
 
-from trapi_predict_kit.predict_output import PredictOptions
 from trapi_predict_kit.trapi_parser import resolve_trapi_query
-from trapi_predict_kit.utils import log
+from trapi_predict_kit.types import PredictOptions
 
 REQUIRED_TAGS = [
     {"name": "reasoner"},
@@ -203,15 +202,11 @@ You can also try this query to retrieve similar entities to a given drug:
             :return: JSON with biolink entities
             """
             metakg = {"edges": [], "nodes": {}}
-            log.info("IN TRAPI METAKG")
-            log.info(self.predict_endpoints)
-            print("IN TRAPI METAKG", predict_endpoints, flush=True)
             for predict_func in self.predict_endpoints:
                 if predict_func._trapi_predict["edges"] not in metakg["edges"]:
                     metakg["edges"] += predict_func._trapi_predict["edges"]
                 # Merge nodes dict
                 metakg["nodes"] = {**metakg["nodes"], **predict_func._trapi_predict["nodes"]}
-
             return JSONResponse(metakg)
 
         @self.middleware("http")
@@ -255,10 +250,7 @@ You can also try this query to retrieve similar entities to a given drug:
                         ),
                     )
                 except Exception as e:
-                    import traceback
-
-                    print(traceback.format_exc())
-                    return (f"Error when running the prediction: {e}", 500)
+                    return (f"Error when getting the predictions: {e}", 500)
 
             return prediction_endpoint
 
