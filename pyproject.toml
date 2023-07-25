@@ -53,6 +53,9 @@ test = [
     "pytest-cov >=3.0.0",
     "pre-commit",
     "mypy >=0.991",
+    "scikit-learn",
+    "pandas",
+    "httpx",
     "types-requests",
 ]
 doc = [
@@ -158,28 +161,28 @@ src = ["src", "tests"]
 target-version = "py38"
 line-length = 120
 select = [
-    "A",
-    "B",   # flake8-bugbear
-    "C",   # flake8-comprehensions
-    "E",   # pycodestyle errors
-    "F",   # pyflakes
-    # "FBT", # flake8-boolean-trap
-    "I",   # isort
-    "ICN",
-    "N",
-    "PLC",
-    "PLE",
-    "PLR",
-    "PLW",
-    "Q",
-    "RUF",
-    "S",
-    "SIM",
+    "I",     # isort
+    "N",     # pep8-naming
+    "S",     # bandit
+    "A",     # flake8-builtins
+    "YTT",   # flake8-2020
+    "B",     # flake8-bugbear
+    "C",     # flake8-comprehensions
+    "ICN",   # flake8-import-conventions
+    "SIM",   # flake8-simplify
+    "TID",   # flake8-tidy-imports
+    "Q",     # flake8-quotes
+    # "FBT",   # flake8-boolean-trap
+    "F",     # pyflakes
+    "UP",    # pyupgrade
+    "E",     # pycodestyle errors
+    "W",     # pycodestyle warnings
+    "PLC",   # pylint convention
+    "PLE",   # pylint error
+    # "PLR",   # pylint refactor Magic value used in comparison, consider replacing 400 with a constant variable
+    "PLW",   # pylint warning
+    "RUF",   # ruff specific
     "T",
-    "TID",
-    "UP",
-    "W",  # pycodestyle warnings
-    "YTT",
 ]
 ignore = [
     "E501", # line too long

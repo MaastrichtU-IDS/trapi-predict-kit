@@ -97,26 +97,16 @@ openapi_info = {
     },
 }
 
-servers = []
-if settings.VIRTUAL_HOST:
-    servers = [
-        {
-            "url": f"https://{settings.VIRTUAL_HOST}",
-            "description": "TRAPI ITRB Production Server",
-            "x-maturity": "production",
-        },
-    ]
-
 app = TRAPI(
     predict_endpoints=predict_endpoints,
-    servers=servers,
     info=openapi_info,
     title="TRAPI predict kit dev",
     version="1.0.0",
     openapi_version="3.0.1",
     description="""TRAPI predict kit development
 \n\nService supported by the [NCATS Translator project](https://ncats.nih.gov/translator/about)""",
-    dev_mode=True,
+    itrb_url_prefix="openpredict",
+    dev_server_url="https://openpredict.semanticscience.org",
 )
 
 

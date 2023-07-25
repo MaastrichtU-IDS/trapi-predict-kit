@@ -1,3 +1,4 @@
+import os.path
 import pickle
 from dataclasses import dataclass
 from typing import Any, Optional
@@ -27,16 +28,17 @@ def save(
     method: str = "pickle",
     scores: Optional[Any] = None,
     hyper_params: Optional[Any] = None,
-    # model: Any,
-    # path: str,
-    # sample_data: Any,
-    # scores: Optional[Dict] = None,
-    # hyper_params: Optional[Dict] = None,
+    # hyper_params: Optional[dict] = None,
 ) -> LoadedModel:
     model_name = path.rsplit("/", 1)[-1]
-    # print(os.path.isabs(path))
-    # if not os.path.isabs(path):
-    #     path = os.path.join(os.getcwd(), path)
+    # Create the parent directory if it doesn't exist
+    parent_dir = os.path.dirname(path)
+    if not os.path.exists(parent_dir):
+        try:
+            os.makedirs(parent_dir)
+        except OSError as e:
+            log.warn(f"Error creating directory: {e}")
+
     log.info(f"💾 Saving the model in {path} using {method}")
 
     # mlem_model = MlemModel.from_obj(model, sample_data=sample_data)
@@ -50,7 +52,6 @@ def save(
 
     g = get_run_metadata(scores, sample_data, hyper_params, model_name)
     g.serialize(f"{path}.ttl", format="ttl")
-    # os.chmod(f"{path}.ttl", 0o644)
     # os.chmod(f"{path}.mlem", 0o644)
 
     return LoadedModel(
