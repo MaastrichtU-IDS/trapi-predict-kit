@@ -4,7 +4,6 @@ from typing import Any, Callable, Dict, List, Optional
 
 from fastapi import Body, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.openapi.utils import get_openapi
 from fastapi.responses import JSONResponse, RedirectResponse
 from reasoner_pydantic import Query
 
@@ -274,27 +273,3 @@ You can also try this query to retrieve similar entities to a given drug:
                 response_model=dict,
                 tags=["models"],
             )
-
-    def openapi(self) -> Dict[str, Any]:
-        """Build custom OpenAPI schema."""
-        if self.openapi_schema:
-            return self.openapi_schema
-
-        tags = REQUIRED_TAGS
-        if self.openapi_tags:
-            tags += self.openapi_tags
-
-        openapi_schema = get_openapi(
-            # **self.info,
-            title=self.title,
-            version=self.version,
-            openapi_version=self.openapi_version,
-            description=self.description,
-            routes=self.routes,
-            tags=tags,
-        )
-
-        openapi_schema["servers"] = self.servers
-        openapi_schema["info"] = {**openapi_schema["info"], **self.info}
-        self.openapi_schema = openapi_schema
-        return self.openapi_schema
