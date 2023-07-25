@@ -2,7 +2,7 @@ import logging
 import uuid
 from datetime import datetime
 from itertools import zip_longest
-from typing import List
+from typing import Any, List
 
 import requests
 from rdflib import RDF, Graph, Literal, Namespace, URIRef
@@ -21,7 +21,7 @@ console_handler.setFormatter(formatter)
 log.addHandler(console_handler)
 
 
-def resolve_entities(label: str) -> dict:
+def resolve_entities(label: str) -> Any:
     """Use Translator SRI Name Resolution API to get the preferred Translator ID"""
     resp = requests.post(
         "https://name-resolution-sri.renci.org/lookup",
@@ -53,7 +53,7 @@ def normalize_id_to_translator(ids_list: List[str]) -> dict:
     return converted_ids_obj
 
 
-def get_entity_types(entity):
+def get_entity_types(entity: str) -> Any:
     """Use Translator SRI NodeNormalization API to get the preferred Translator ID
     for an ID https://nodenormalization-sri.renci.org/docs
     """
@@ -69,7 +69,7 @@ def get_entity_types(entity):
     return []
 
 
-def get_entities_labels(entity_list):
+def get_entities_labels(entity_list: list[str]) -> Any:
     """Send the list of node IDs to Translator Normalization API to get labels
     See API: https://nodenormalization-sri.renci.org/apidocs/#/Interfaces/get_get_normalized_nodes
     and example notebook: https://github.com/TranslatorIIPrototypes/NodeNormalization/blob/master/documentation/NodeNormalization.ipynb
@@ -112,7 +112,7 @@ MLS = Namespace("http://www.w3.org/ns/mls#")
 OPENPREDICT = Namespace("https://w3id.org/openpredict/")
 
 
-def get_run_metadata(scores, model_features, hyper_params, run_id=None):
+def get_run_metadata(scores: dict, model_features: dict, hyper_params: dict, run_id: str | None = None) -> Graph:
     """Generate RDF metadata for a classifier and save it in data/openpredict-metadata.ttl, based on OpenPredict model:
     https://github.com/fair-workflows/openpredict/blob/master/data/rdf/results_disjoint_lr.nq
 

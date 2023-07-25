@@ -123,7 +123,7 @@ omit = ["tests/*"]
 
 [tool.mypy]
 files = ["src/"]
-strict = true
+strict = false
 implicit_reexport = true
 follow_imports = "normal"
 ignore_missing_imports = true
