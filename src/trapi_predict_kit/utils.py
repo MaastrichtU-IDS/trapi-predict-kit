@@ -69,7 +69,7 @@ def get_entity_types(entity: str) -> Any:
     return []
 
 
-def get_entities_labels(entity_list: list[str]) -> Any:
+def get_entities_labels(entity_list: List[str]) -> Any:
     """Send the list of node IDs to Translator Normalization API to get labels
     See API: https://nodenormalization-sri.renci.org/apidocs/#/Interfaces/get_get_normalized_nodes
     and example notebook: https://github.com/TranslatorIIPrototypes/NodeNormalization/blob/master/documentation/NodeNormalization.ipynb
