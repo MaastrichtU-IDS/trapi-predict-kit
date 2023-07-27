@@ -2,7 +2,7 @@ import logging
 import uuid
 from datetime import datetime
 from itertools import zip_longest
-from typing import Any, List
+from typing import Any, List, Optional
 
 import requests
 from rdflib import RDF, Graph, Literal, Namespace, URIRef
@@ -112,7 +112,7 @@ MLS = Namespace("http://www.w3.org/ns/mls#")
 OPENPREDICT = Namespace("https://w3id.org/openpredict/")
 
 
-def get_run_metadata(scores: dict, model_features: dict, hyper_params: dict, run_id: str | None = None) -> Graph:
+def get_run_metadata(scores: dict, model_features: dict, hyper_params: dict, run_id: Optional[str] = None) -> Graph:
     """Generate RDF metadata for a classifier and save it in data/openpredict-metadata.ttl, based on OpenPredict model:
     https://github.com/fair-workflows/openpredict/blob/master/data/rdf/results_disjoint_lr.nq
 
