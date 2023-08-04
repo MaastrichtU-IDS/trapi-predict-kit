@@ -272,7 +272,7 @@ You can also try this query to retrieve similar entities to a given drug:
         if self.openapi_schema:
             return self.openapi_schema
 
-        tags = self.required_tags
+        tags = REQUIRED_TAGS
         if self.openapi_tags:
             tags += self.openapi_tags
 
