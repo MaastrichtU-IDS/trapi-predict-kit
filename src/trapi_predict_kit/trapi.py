@@ -49,6 +49,7 @@ class TRAPI(FastAPI):
         )
         self.predict_endpoints = predict_endpoints
         self.info = info
+        self.openapi_version = openapi_version
 
         # On ITRB deployment and local dev we directly use the current server
         self.servers = []
