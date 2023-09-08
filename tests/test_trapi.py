@@ -2,9 +2,47 @@ import json
 
 from fastapi.testclient import TestClient
 
+from trapi_predict_kit import settings
+
 from .conftest import app
 
 client = TestClient(app)
+
+validator = None
+try:
+    from reasoner_validator.validator import TRAPIResponseValidator
+
+    # NOTE: Validate only prod because validate requires py3.9+ and OpenPredict requires 3.8
+    validator = TRAPIResponseValidator(
+        trapi_version=settings.TRAPI_VERSION,
+        # If None, then the current Biolink Model Toolkit default release applies
+        biolink_version=settings.BIOLINK_VERSION,
+        # 'sources' are set to trigger checking of expected edge knowledge source provenance
+        # sources={
+        #     "ara_source": "infores:molepro",
+        #     "kp_source": "infores:knowledge-collaboratory",
+        #     "kp_source_type": "primary"
+        # },
+        # None let the system decide the default validation strictness by validation context
+        strict_validation=None,
+    )
+except Exception:
+    print("reasoner-validator not found, not running TRAPI response validation checks")
+
+
+def check_trapi_compliance(response):
+    if validator:
+        # validator.check_compliance_of_trapi_response(response.json()["message"])
+        validator.check_compliance_of_trapi_response(response.json())
+        validator_resp = validator.get_messages()
+        print("⚠️ REASONER VALIDATOR WARNINGS:")
+        print(validator_resp["warnings"])
+        if len(validator_resp["errors"]) == 0:
+            print("✅ NO REASONER VALIDATOR ERRORS")
+        else:
+            print("🧨 REASONER VALIDATOR ERRORS")
+            print(validator_resp["errors"])
+        assert len(validator_resp["errors"]) == 0
 
 
 def test_get_predict_drug():
@@ -49,6 +87,7 @@ def test_post_trapi():
     )
     edges = response.json()["message"]["knowledge_graph"]["edges"].items()
     assert len(edges) == 1
+    check_trapi_compliance(response)
 
 
 def test_trapi_empty_response():

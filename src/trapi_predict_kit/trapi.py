@@ -127,7 +127,7 @@ class TRAPI(FastAPI):
             name="TRAPI query",
             description="""The default example TRAPI query will give you a list of predicted potential drug treatments for a given disease
 
-You can also try this query to retrieve similar entities to a given drug:
+You can also try this query to retrieve similar entities for a given drug:
 
 ```json
 {
