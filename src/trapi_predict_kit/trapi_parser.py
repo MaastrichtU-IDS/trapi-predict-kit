@@ -172,6 +172,11 @@ def resolve_trapi_query(reasoner_query, endpoints_list):
                     and any(i in subject_parents for i in query_plan[edge_qg_id]["subject_types"])
                     and any(i in object_parents for i in query_plan[edge_qg_id]["object_types"])
                 ):
+                    # TODO: pass all ids_to_predict instead of iterating
+                    # And also pass the list of target IDs if provided: query_plan[edge_qg_id]["object_kg_id"]
+                    # if "subject_kg_id" in query_plan[edge_id]
+                    #     and "object_kg_id" in query_plan[edge_id]
+                    # New params are: input_ids, target_ids (target can be None, input is length 1 minimum)
                     for id_to_predict in query_plan[edge_id]["ids_to_predict"]:
                         labels_dict = get_entities_labels([id_to_predict])
                         label_to_predict = None
@@ -280,6 +285,7 @@ def resolve_trapi_query(reasoner_query, endpoints_list):
                                             "attribute_source": "infores:openpredict",
                                         },
                                     ],
+                                    # "knowledge_types": knowledge_types
                                 }
 
                                 # Map the source/target of query_graph to source/target of association

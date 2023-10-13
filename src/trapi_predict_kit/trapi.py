@@ -216,7 +216,7 @@ You can also try this query to retrieve similar entities for a given drug:
             start_time = time.time()
             response = await call_next(request)
             process_time = time.time() - start_time
-            response.headers["X-Process-Time"] = str(process_time)
+            response.headers["Server-Timing"] = f"total;dur={process_time}"
             return response
 
         @self.get("/health", include_in_schema=False)
