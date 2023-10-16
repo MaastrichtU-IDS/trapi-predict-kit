@@ -1,6 +1,6 @@
 from .decorators import trapi_predict
 from .save import LoadedModel, load, save
-from .types import PredictHit, PredictOptions, PredictOutput, TrainingOutput
+from .types import PredictHit, PredictInput, PredictOptions, PredictOutput, TrainingOutput
 from .trapi import TRAPI
 from .config import settings
 from .utils import (

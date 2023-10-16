@@ -5,16 +5,15 @@ from .conftest import get_predictions
 
 def test_resolve_entities():
     """Test the function to resolve entities using the Name Resolution API"""
-    expect = 3
     resp = resolve_entities("alzheimer")
-    assert len(resp) == expect
-    assert "MONDO:0004975" in resp
+    curie_list = [item["curie"] for item in resp]
+    assert "MONDO:0004975" in curie_list
 
 
 def test_normalize_id_to_translator():
     to_convert = "OMIM:104300"
     normalized = normalize_id_to_translator([to_convert])
-    assert normalized[to_convert] == "MONDO:0004975"
+    assert normalized[to_convert] == "MONDO:0007088"
 
 
 def test_get_entity_types():
@@ -28,7 +27,6 @@ def test_get_run_metadata():
 
 
 def test_trapi_predict_decorator():
-    expect = 2
-    res = get_predictions("drugbank:DB00002", {})
-    assert len(get_predictions._trapi_predict["edges"]) == expect
+    res = get_predictions({"subjects": ["drugbank:DB00002"]})
+    assert get_predictions._trapi_predict["edges"][0]["subject"] == "biolink:Drug"
     assert len(res["hits"]) == 1

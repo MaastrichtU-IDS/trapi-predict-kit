@@ -3,7 +3,7 @@ from typing import Any, Callable, Dict, List, Optional
 
 from reasoner_pydantic import MetaEdge, MetaNode
 
-from trapi_predict_kit.types import PredictOptions
+from trapi_predict_kit.types import PredictInput
 
 
 def trapi_predict(
@@ -12,7 +12,7 @@ def trapi_predict(
     nodes: Dict[str, MetaNode],
     name: Optional[str] = None,
     description: Optional[str] = "",
-    default_input: Optional[str] = "drugbank:DB00394",
+    default_input: Optional[str] = None,
     default_model: Optional[str] = "openpredict_baseline",
 ) -> Callable:
     """A decorator to indicate a function is a function to generate prediction that can be integrated to TRAPI.
@@ -23,9 +23,8 @@ def trapi_predict(
 
     def decorator(func: Callable) -> Any:
         @functools.wraps(func)
-        def wrapper(input_id: str, options: Optional[PredictOptions] = None) -> Any:
-            options = PredictOptions.parse_obj(options) if options else PredictOptions()
-            return func(input_id, options)
+        def wrapper(request: PredictInput) -> Any:
+            return func(PredictInput.parse_obj(request))
 
         wrapper._trapi_predict = {
             "edges": edges,

@@ -21,6 +21,48 @@ console_handler.setFormatter(formatter)
 log.addHandler(console_handler)
 
 
+def is_accepted_id(id_to_check):
+    return id_to_check.lower().startswith("omim") or id_to_check.lower().startswith("drugbank")
+
+
+def resolve_ids_with_nodenormalization_api(resolve_ids_list, resolved_ids_object):
+    ids_to_normalize = []
+    for id_to_resolve in resolve_ids_list:
+        if is_accepted_id(id_to_resolve):
+            resolved_ids_object[id_to_resolve] = id_to_resolve
+        else:
+            ids_to_normalize.append(id_to_resolve)
+
+    # Query Translator NodeNormalization API to convert IDs to OMIM/DrugBank IDs
+    if len(ids_to_normalize) > 0:
+        try:
+            resolve_curies = requests.get(
+                "https://nodenormalization-sri.renci.org/get_normalized_nodes",
+                params={"curie": ids_to_normalize},
+                timeout=settings.TIMEOUT,
+            )
+            # Get corresponding OMIM IDs for MONDO IDs if match
+            resp = resolve_curies.json()
+            for resolved_id, alt_ids in resp.items():
+                for alt_id in alt_ids["equivalent_identifiers"]:
+                    if is_accepted_id(str(alt_id["identifier"])):
+                        main_id = str(alt_id["identifier"])
+                        # NOTE: fix issue when NodeNorm returns OMIM.PS: instead of OMIM:
+                        if main_id.lower().startswith("omim"):
+                            main_id = "OMIM:" + main_id.split(":", 1)[1]
+                        resolved_ids_object[main_id] = resolved_id
+        except Exception:
+            log.warn("Error querying the NodeNormalization API, using the original IDs")
+    # log.info(f"Resolved: {resolve_ids_list} to {resolved_ids_object}")
+    return resolved_ids_object
+
+
+def resolve_id(id_to_resolve, resolved_ids_object):
+    if id_to_resolve in resolved_ids_object:
+        return resolved_ids_object[id_to_resolve]
+    return id_to_resolve
+
+
 def resolve_entities(label: str) -> Any:
     """Use Translator SRI Name Resolution API to get the preferred Translator ID"""
     resp = requests.post(
@@ -36,9 +78,9 @@ def normalize_id_to_translator(ids_list: List[str]) -> dict:
     for an ID https://nodenormalization-sri.renci.org/docs
     """
     converted_ids_obj = {}
-    resolve_curies = requests.get(
+    resolve_curies = requests.post(
         "https://nodenormalization-sri.renci.org/get_normalized_nodes",
-        params={"curie": ids_list},
+        json={"curies": ids_list},
         timeout=settings.TIMEOUT,
     )
     # Get corresponding OMIM IDs for MONDO IDs if match
@@ -184,7 +226,7 @@ def get_run_metadata(scores: dict, model_features: dict, hyper_params: dict, run
     # Add scores as EvaluationMeasures
     g.add((evaluation_uri, RDF.type, MLS["ModelEvaluation"]))
     for key in scores:
-        key_uri = URIRef(run_prop_prefix + key)
+        key_uri = URIRef(f"{run_prop_prefix}{key}")
         g.add((evaluation_uri, MLS["specifiedBy"], key_uri))
         g.add((key_uri, RDF.type, MLS["EvaluationMeasure"]))
         g.add((key_uri, RDFS.label, Literal(key)))

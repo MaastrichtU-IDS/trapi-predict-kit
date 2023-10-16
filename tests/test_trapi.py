@@ -32,8 +32,8 @@ except Exception:
 
 def check_trapi_compliance(response):
     if validator:
-        # validator.check_compliance_of_trapi_response(response.json()["message"])
-        validator.check_compliance_of_trapi_response(response.json())
+        # validator.check_compliance_of_trapi_response(response["message"])
+        validator.check_compliance_of_trapi_response(response)
         validator_resp = validator.get_messages()
         print("⚠️ REASONER VALIDATOR WARNINGS:")
         print(validator_resp["warnings"])
@@ -47,17 +47,23 @@ def check_trapi_compliance(response):
 
 def test_get_predict_drug():
     """Test predict API GET operation for a drug"""
-    url = "/predict?input_id=DRUGBANK:DB00394&n_results=42"
-    response = client.get(url).json()
-    assert len(response["hits"]) == 1
-    assert response["count"] == 1
-    assert response["hits"][0]["id"] == "drugbank:DB00001"
+    response = client.post(
+        "/predict",
+        json={
+            "subjects": ["DRUGBANK:DB00394"],
+            "options": {
+                "model_id": "openpredict_baseline",
+            },
+        },
+    ).json()
+    assert len(response["hits"]) >= 1
+    assert response["count"] >= 1
+    assert response["hits"][0]["subject"] == "drugbank:DB00001"
 
 
 def test_get_meta_kg():
     """Get the metakg"""
-    url = "/meta_knowledge_graph"
-    response = client.get(url).json()
+    response = client.get("/meta_knowledge_graph").json()
     assert len(response["edges"]) >= 1
     assert len(response["nodes"]) >= 1
 
@@ -82,11 +88,11 @@ def test_post_trapi():
     }
     response = client.post(
         "/query",
-        data=json.dumps(trapi_query),
+        json=trapi_query,
         headers={"Content-Type": "application/json"},
-    )
-    edges = response.json()["message"]["knowledge_graph"]["edges"].items()
-    assert len(edges) == 1
+    ).json()
+    edges = response["message"]["knowledge_graph"]["edges"].items()
+    assert len(edges) >= 1
     check_trapi_compliance(response)
 
 

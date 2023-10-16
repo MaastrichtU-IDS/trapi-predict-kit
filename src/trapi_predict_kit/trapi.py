@@ -9,7 +9,7 @@ from fastapi.responses import JSONResponse, RedirectResponse
 from reasoner_pydantic import Query
 
 from trapi_predict_kit.trapi_parser import resolve_trapi_query
-from trapi_predict_kit.types import PredictOptions
+from trapi_predict_kit.types import PredictInput
 
 REQUIRED_TAGS = [
     {"name": "reasoner"},
@@ -49,6 +49,9 @@ class TRAPI(FastAPI):
         )
         self.predict_endpoints = predict_endpoints
         self.info = info
+        self.infores = self.info.get("x-translator", {}).get("infores")
+        if not self.infores and itrb_url_prefix:
+            self.infores = f"infores:{itrb_url_prefix}"
         self.openapi_version = openapi_version
 
         # On ITRB deployment and local dev we directly use the current server
@@ -187,7 +190,9 @@ You can also try this query to retrieve similar entities for a given drug:
                 }
                 # return ({"status": 501, "title": "Not Implemented", "detail": "Multi-edges queries not yet implemented", "type": "about:blank" }, 501)
 
-            reasonerapi_response = resolve_trapi_query(request_body.dict(exclude_none=True), self.predict_endpoints)
+            reasonerapi_response = resolve_trapi_query(
+                request_body.dict(exclude_none=True), self.predict_endpoints, self.infores
+            )
 
             return JSONResponse(reasonerapi_response) or ("Not found", 404)
 
@@ -205,8 +210,25 @@ You can also try this query to retrieve similar entities for a given drug:
             """
             metakg = {"edges": [], "nodes": {}}
             for predict_func in self.predict_endpoints:
-                if predict_func._trapi_predict["edges"] not in metakg["edges"]:
-                    metakg["edges"] += predict_func._trapi_predict["edges"]
+                for func_edge in predict_func._trapi_predict["edges"]:
+                    meta_edge = [
+                        {
+                            "subject": func_edge.get("subject"),
+                            "predicate": func_edge.get("predicate"),
+                            "object": func_edge.get("object"),
+                        }
+                    ]
+                    if "inverse" in predict_func._trapi_predict and predict_func._trapi_predict["inverse"]:
+                        meta_edge.append(
+                            {
+                                "subject": func_edge.get("object"),
+                                "predicate": func_edge.get("inverse"),
+                                "object": func_edge.get("subject"),
+                            }
+                        )
+
+                if meta_edge not in metakg["edges"]:
+                    metakg["edges"] += meta_edge
                 # Merge nodes dict
                 metakg["nodes"] = {**metakg["nodes"], **predict_func._trapi_predict["nodes"]}
             return JSONResponse(metakg)
@@ -231,26 +253,9 @@ You can also try this query to retrieve similar entities for a given drug:
 
         # Generate endpoints for the loaded models
         def endpoint_factory(predict_func):
-            def prediction_endpoint(
-                input_id: str = predict_func._trapi_predict["default_input"],
-                model_id: str = predict_func._trapi_predict["default_model"],
-                min_score: Optional[float] = None,
-                max_score: Optional[float] = None,
-                n_results: Optional[int] = None,
-            ):
+            def prediction_endpoint(request: PredictInput):
                 try:
-                    return predict_func(
-                        input_id,
-                        PredictOptions.parse_obj(
-                            {
-                                "model_id": model_id,
-                                "min_score": min_score,
-                                "max_score": max_score,
-                                "n_results": n_results,
-                                # "types": ['biolink:Drug'],
-                            }
-                        ),
-                    )
+                    return predict_func(PredictInput.parse_obj(request))
                 except Exception as e:
                     return (f"Error when getting the predictions: {e}", 500)
 
@@ -259,8 +264,7 @@ You can also try this query to retrieve similar entities for a given drug:
         for predict_func in self.predict_endpoints:
             self.add_api_route(
                 path=predict_func._trapi_predict["path"],
-                methods=["GET"],
-                # endpoint=copy_func(prediction_endpoint, model['path'].replace('/', '')),
+                methods=["POST"],
                 endpoint=endpoint_factory(predict_func),
                 name=predict_func._trapi_predict["name"],
                 openapi_extra={"description": predict_func._trapi_predict["description"]},

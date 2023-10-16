@@ -11,21 +11,18 @@ The annotated predict functions are expected to take 2 input arguments: the inpu
 Here is an example:
 
 ```python
-from trapi_predict_kit import trapi_predict, PredictOptions, PredictOutput
+from trapi_predict_kit import trapi_predict, PredictInput, PredictOutput
 
-@trapi_predict(path='/predict',
+@trapi_predict(
+    path='/predict',
     name="Get predicted targets for a given entity",
     description="Return the predicted targets for a given entity: drug (DrugBank ID) or disease (OMIM ID), with confidence scores.",
     edges=[
         {
             'subject': 'biolink:Drug',
             'predicate': 'biolink:treats',
+            'inverse': 'biolink:treated_by',
             'object': 'biolink:Disease',
-        },
-        {
-            'subject': 'biolink:Disease',
-            'predicate': 'biolink:treated_by',
-            'object': 'biolink:Drug',
         },
     ],
 	nodes={
@@ -41,22 +38,19 @@ from trapi_predict_kit import trapi_predict, PredictOptions, PredictOutput
         }
     }
 )
-def get_predictions(
-        input_id: str, options: PredictOptions
-    ) -> PredictOutput:
+def get_predictions(request: PredictInput) -> PredictOutput:
+    predictions = []
     # Add the code the load the model and get predictions here
-    predictions = {
-        "hits": [
-            {
-                "id": "drugbank:DB00001",
-                "type": "biolink:Drug",
-                "score": 0.12345,
-                "label": "Leipirudin",
-            }
-        ],
-        "count": 1,
-    }
-    return predictions
+    # Available props: request.subjects, request.objects, request.options
+    for subject in request.subjects:
+        predictions.append({
+            "subject": subject,
+            "object": "DB00001",
+            "score": 0.12345,
+            "object_label": "Leipirudin",
+            "object_type": "biolink:Drug",
+        })
+    return {"hits": predictions, "count": len(predictions)}
 ```
 
 If you generated a project from the template you will find it in the `predict.py` script.

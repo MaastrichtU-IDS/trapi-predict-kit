@@ -37,6 +37,7 @@ dependencies = [
     "SPARQLWrapper >=2.0.0,<3.0.0",
     "reasoner-pydantic >=3.0.1",
     "mlem",
+    "dvc",
     # "fairworkflows @ git+https://github.com/vemonet/fairworkflows.git",
 ]
 

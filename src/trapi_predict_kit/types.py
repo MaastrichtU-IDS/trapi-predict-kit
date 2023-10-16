@@ -4,10 +4,17 @@ from pydantic import BaseModel
 
 
 class PredictHit(BaseModel):
-    id: str
-    type: str
+    subject: str
+    object: str
     score: float
+    subject_type: Optional[str]
+    object_type: Optional[str]
     label: Optional[str]
+    subject_label: Optional[str]
+    object_label: Optional[str]
+
+    class Config:
+        arbitrary_types_allowed = True
 
 
 class PredictOutput(BaseModel):
@@ -18,11 +25,20 @@ class PredictOutput(BaseModel):
 
 
 class PredictOptions(BaseModel):
-    model_id: Optional[str] = "openpredict_baseline"
+    model_id: Optional[str] = None
     min_score: Optional[float] = None
     max_score: Optional[float] = None
     n_results: Optional[int] = None
-    types: Optional[List[str]] = None
+    # types: Optional[List[str]] = None
+
+    class Config:
+        arbitrary_types_allowed = True
+
+
+class PredictInput(BaseModel):
+    subjects: List[str] = []
+    objects: List[str] = []
+    options: PredictOptions = PredictOptions()
 
     class Config:
         arbitrary_types_allowed = True
