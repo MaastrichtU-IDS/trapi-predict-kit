@@ -5,11 +5,12 @@ from itertools import zip_longest
 from typing import Any, List, Optional
 
 import requests
-from pandas import DataFrame
 from rdflib import RDF, Graph, Literal, Namespace, URIRef
 from rdflib.namespace import DC, RDFS, XSD
 
 from trapi_predict_kit.config import settings
+
+# from pandas import DataFrame
 
 ## Instantiate logging utility
 log = logging.getLogger("uvicorn.error")
@@ -62,24 +63,24 @@ def resolve_ids_with_nodenormalization_api(resolve_ids_list, resolved_ids_object
 
 
 # TODO: returns a df with id, pref_id, label, type
-def resolve_ids(ids: List[str], supported_prefixes: Optional[List[str]] = None):
-    # if not supported_prefixes:
-    #     supported_prefixes = []
-    try:
-        resp = requests.post(
-            "https://nodenormalization-sri.renci.org/get_normalized_nodes",
-            json={"curies": ids},
-            timeout=settings.TIMEOUT,
-        ).json()
-        entities_list = [
-            {"id": input_id, "pref_id": obj["id"]["identifier"], "label": obj["id"]["label"], "type": obj["type"][0]}
-            for input_id, obj in resp.items()
-        ]
+# def resolve_ids(ids: List[str], supported_prefixes: Optional[List[str]] = None):
+#     # if not supported_prefixes:
+#     #     supported_prefixes = []
+#     try:
+#         resp = requests.post(
+#             "https://nodenormalization-sri.renci.org/get_normalized_nodes",
+#             json={"curies": ids},
+#             timeout=settings.TIMEOUT,
+#         ).json()
+#         entities_list = [
+#             {"id": input_id, "pref_id": obj["id"]["identifier"], "label": obj["id"]["label"], "type": obj["type"][0]}
+#             for input_id, obj in resp.items()
+#         ]
 
-    except Exception:
-        log.warn("Error querying the NodeNormalization API, using the original IDs")
-    # log.info(f"Resolved: {resolve_ids_list} to {resolved_ids_object}")
-    return DataFrame(entities_list, columns=["id", "pref_id", "label", "type"])
+#     except Exception:
+#         log.warn("Error querying the NodeNormalization API, using the original IDs")
+#     # log.info(f"Resolved: {resolve_ids_list} to {resolved_ids_object}")
+#     return DataFrame(entities_list, columns=["id", "pref_id", "label", "type"])
 
 
 def resolve_id(id_to_resolve, resolved_ids_object):

@@ -34,12 +34,12 @@ dependencies = [
     "pydantic >=1.9",
     "fastapi >=0.68.1",
     "rdflib >=6.1.1",
-    "SPARQLWrapper >=2.0.0,<3.0.0",
     "reasoner-pydantic >=3.0.1",
     "mlem",
     "dvc",
     "bmt",
     # "fairworkflows @ git+https://github.com/vemonet/fairworkflows.git",
+    # "SPARQLWrapper >=2.0.0,<3.0.0",
 ]
 
 
@@ -56,8 +56,8 @@ test = [
     "scikit-learn",
     "pandas",
     "httpx",
-    "types-requests",
     "reasoner-validator",
+    "types-requests",
 ]
 doc = [
     "mkdocs >=1.4.2",
