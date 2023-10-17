@@ -53,7 +53,7 @@ class TRAPI(FastAPI):
         itrb_url_prefix: Optional[str] = None,
         dev_server_url: Optional[str] = None,
         trapi_example: Optional[Query] = None,
-        trapi_description: Optional[str] = default_trapi_description,
+        trapi_description: str = default_trapi_description,
         info: Optional[Dict[str, Any]] = None,
         title="Translator Reasoner API",
         version="1.0.0",
@@ -78,6 +78,7 @@ class TRAPI(FastAPI):
             self.infores = f"infores:{itrb_url_prefix}"
         self.openapi_version = openapi_version
         self.trapi_example = trapi_example if trapi_example else default_trapi_example
+        self.trapi_description = trapi_description
 
         # On ITRB deployment and local dev we directly use the current server
         self.servers = []
