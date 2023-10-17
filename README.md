@@ -8,7 +8,6 @@
 [![code style - black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 [![Test package](https://github.com/MaastrichtU-IDS/trapi-predict-kit/actions/workflows/test.yml/badge.svg)](https://github.com/MaastrichtU-IDS/trapi-predict-kit/actions/workflows/test.yml)
-[![Publish package](https://github.com/MaastrichtU-IDS/trapi-predict-kit/actions/workflows/publish.yml/badge.svg)](https://github.com/MaastrichtU-IDS/trapi-predict-kit/actions/workflows/publish.yml)
 
 </div>
 
