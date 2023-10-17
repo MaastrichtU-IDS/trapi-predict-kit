@@ -5,6 +5,7 @@ from itertools import zip_longest
 from typing import Any, List, Optional
 
 import requests
+from pandas import DataFrame
 from rdflib import RDF, Graph, Literal, Namespace, URIRef
 from rdflib.namespace import DC, RDFS, XSD
 
@@ -20,13 +21,17 @@ formatter = logging.Formatter("%(asctime)s %(levelname)s: [%(module)s:%(funcName
 console_handler.setFormatter(formatter)
 log.addHandler(console_handler)
 
+accepted_prefixes = ["omim", "drugbank"]
+
 
 def is_accepted_id(id_to_check):
-    return id_to_check.lower().startswith("omim") or id_to_check.lower().startswith("drugbank")
+    return any(id_to_check.lower().startswith(prefix) for prefix in accepted_prefixes)
 
 
+# Returns an object with supported ID as key, and given ID as value
 def resolve_ids_with_nodenormalization_api(resolve_ids_list, resolved_ids_object):
     ids_to_normalize = []
+
     for id_to_resolve in resolve_ids_list:
         if is_accepted_id(id_to_resolve):
             resolved_ids_object[id_to_resolve] = id_to_resolve
@@ -36,13 +41,12 @@ def resolve_ids_with_nodenormalization_api(resolve_ids_list, resolved_ids_object
     # Query Translator NodeNormalization API to convert IDs to OMIM/DrugBank IDs
     if len(ids_to_normalize) > 0:
         try:
-            resolve_curies = requests.get(
+            resp = requests.post(
                 "https://nodenormalization-sri.renci.org/get_normalized_nodes",
-                params={"curie": ids_to_normalize},
+                json={"curies": ids_to_normalize},
                 timeout=settings.TIMEOUT,
-            )
+            ).json()
             # Get corresponding OMIM IDs for MONDO IDs if match
-            resp = resolve_curies.json()
             for resolved_id, alt_ids in resp.items():
                 for alt_id in alt_ids["equivalent_identifiers"]:
                     if is_accepted_id(str(alt_id["identifier"])):
@@ -55,6 +59,27 @@ def resolve_ids_with_nodenormalization_api(resolve_ids_list, resolved_ids_object
             log.warn("Error querying the NodeNormalization API, using the original IDs")
     # log.info(f"Resolved: {resolve_ids_list} to {resolved_ids_object}")
     return resolved_ids_object
+
+
+# TODO: returns a df with id, pref_id, label, type
+def resolve_ids(ids: List[str], supported_prefixes: Optional[List[str]] = None):
+    # if not supported_prefixes:
+    #     supported_prefixes = []
+    try:
+        resp = requests.post(
+            "https://nodenormalization-sri.renci.org/get_normalized_nodes",
+            json={"curies": ids},
+            timeout=settings.TIMEOUT,
+        ).json()
+        entities_list = [
+            {"id": input_id, "pref_id": obj["id"]["identifier"], "label": obj["id"]["label"], "type": obj["type"][0]}
+            for input_id, obj in resp.items()
+        ]
+
+    except Exception:
+        log.warn("Error querying the NodeNormalization API, using the original IDs")
+    # log.info(f"Resolved: {resolve_ids_list} to {resolved_ids_object}")
+    return DataFrame(entities_list, columns=["id", "pref_id", "label", "type"])
 
 
 def resolve_id(id_to_resolve, resolved_ids_object):

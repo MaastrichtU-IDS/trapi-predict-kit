@@ -1,27 +1,27 @@
 import re
 
-import requests
+from bmt import Toolkit
 
 from trapi_predict_kit.config import settings
 from trapi_predict_kit.utils import get_entities_labels, log
 
 # TODO: add evidence path to TRAPI
 
+biolink = Toolkit()
+
 
 def get_biolink_parents(concept):
     concept_snakecase = concept.replace("biolink:", "")
     concept_snakecase = re.sub(r"(?<!^)(?=[A-Z])", "_", concept_snakecase).lower()
-    query_url = f"https://bl-lookup-sri.renci.org/bl/{concept_snakecase}/ancestors"
     try:
-        resolve_curies = requests.get(query_url, timeout=settings.TIMEOUT)
-        # TODO: can't specify a BioLink version because asking for v3.1.0 does not exist, so we use latest
-        # resolve_curies = requests.get(query_url,
-        #                     params={'version': f'v{settings.BIOLINK_VERSION}'})
-        resp = resolve_curies.json()
-        resp.append(concept)
-        return resp
+        return biolink.get_ancestors(
+            name=concept_snakecase,
+            reflexive=True,
+            formatted=True,
+            mixin=True,
+        )
     except Exception as e:
-        log.warn(f"Error querying {query_url}, using the original IDs: {e}")
+        log.warn(f"Error getting parents of {concept_snakecase}, using the original IDs: {e}")
         return [concept]
 
 

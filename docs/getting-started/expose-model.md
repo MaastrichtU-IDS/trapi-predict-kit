@@ -42,10 +42,18 @@ def get_predictions(request: PredictInput) -> PredictOutput:
     predictions = []
     # Add the code the load the model and get predictions here
     # Available props: request.subjects, request.objects, request.options
-    for subject in request.subjects:
+    for subj in request.subjects:
         predictions.append({
-            "subject": subject,
-            "object": "DB00001",
+            "subject": subj,
+            "object": "OMIM:246300",
+            "score": 0.12345,
+            "object_label": "Leipirudin",
+            "object_type": "biolink:Drug",
+        })
+    for obj in request.objects:
+        predictions.append({
+            "subject": "DRUGBANK:DB00001",
+            "object": obj,
             "score": 0.12345,
             "object_label": "Leipirudin",
             "object_type": "biolink:Drug",

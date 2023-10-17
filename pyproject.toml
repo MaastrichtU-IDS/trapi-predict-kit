@@ -38,10 +38,9 @@ dependencies = [
     "reasoner-pydantic >=3.0.1",
     "mlem",
     "dvc",
+    "bmt",
     # "fairworkflows @ git+https://github.com/vemonet/fairworkflows.git",
 ]
-
-
 
 
 [project.optional-dependencies]
@@ -89,8 +88,7 @@ post-install-commands = [
 ]
 
 [tool.hatch.envs.default.scripts]
-dev = "python tests/dev.py {args}"
-api = "uvicorn tests.dev:app --reload {args}"
+dev = "uvicorn tests.dev:app --reload {args}"
 fmt = [
     "pre-commit run --all --all-files",
 ]
