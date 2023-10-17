@@ -37,6 +37,9 @@ default_trapi_example = {
     },
     "query_options": {"max_score": 1, "min_score": 0.5, "n_results": 10},
 }
+default_trapi_description = (
+    "Query the prediction endpoint with [TRAPI queries](https://github.com/NCATSTranslator/ReasonerAPI)"
+)
 
 
 class TRAPI(FastAPI):
@@ -50,6 +53,7 @@ class TRAPI(FastAPI):
         itrb_url_prefix: Optional[str] = None,
         dev_server_url: Optional[str] = None,
         trapi_example: Optional[Query] = None,
+        trapi_description: Optional[str] = default_trapi_description,
         info: Optional[Dict[str, Any]] = None,
         title="Translator Reasoner API",
         version="1.0.0",
@@ -130,36 +134,7 @@ class TRAPI(FastAPI):
         @self.post(
             "/query",
             name="TRAPI query",
-            description="""The default example TRAPI query will give you a list of predicted potential drug treatments for a given disease
-
-You can also try this query to retrieve similar entities for a given drug:
-
-```json
-{
-    "message": {
-        "query_graph": {
-            "edges": {
-                "e01": {
-                    "object": "n1",
-                    "predicates": [ "biolink:similar_to" ],
-                    "subject": "n0"
-                }
-            },
-            "nodes": {
-                "n0": {
-                    "categories": [ "biolink:Drug" ],
-                    "ids": [ "DRUGBANK:DB00394" ]
-                },
-                "n1": {
-                    "categories": [ "biolink:Drug" ]
-                }
-            }
-        }
-    },
-    "query_options": { "n_results": 5 }
-}
-```
-        """,
+            description=self.trapi_description,
             response_model=Query,
             tags=["reasoner"],
         )
