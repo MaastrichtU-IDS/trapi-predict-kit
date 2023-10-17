@@ -151,16 +151,12 @@ def resolve_trapi_query(reasoner_query, endpoints_list, infores: str = ""):
 
                     # Get the labels of all entities returned by the prediction function
                     all_ids = [pred["subject"] for pred in prediction_json] + [
-                        pred["subject"] for pred in prediction_json
+                        pred["object"] for pred in prediction_json
                     ]
                     labels_dict = get_entities_labels(list(set(all_ids)))
 
                     for association in prediction_json:
                         # id/type of nodes are registered in a dict to avoid duplicate in knowledge_graph.nodes
-                        # Build dict of node ID : label
-                        # log.info(resolved_ids_object)
-                        # subject_id = resolve_id(association["subject"], resolved_ids_object)
-                        # object_id = resolve_id(association["object"], resolved_ids_object)
                         subject_id = association["subject"]
                         object_id = association["object"]
 

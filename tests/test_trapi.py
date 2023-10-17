@@ -1,5 +1,3 @@
-import json
-
 from fastapi.testclient import TestClient
 
 from trapi_predict_kit import settings
@@ -109,7 +107,7 @@ def test_trapi_empty_response():
     }
     response = client.post(
         "/query",
-        data=json.dumps(trapi_query),
+        json=trapi_query,
         headers={"Content-Type": "application/json"},
     )
     assert len(response.json()["message"]["results"]) == 0

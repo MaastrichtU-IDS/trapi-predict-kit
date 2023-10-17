@@ -31,8 +31,6 @@ def get_predictions(request: PredictInput) -> PredictOutput:
                 "subject": subj,
                 "object": "OMIM:246300",
                 "score": 0.12345,
-                "object_label": "Leipirudin",
-                "object_type": "biolink:Drug",
             }
         )
     for obj in request.objects:
@@ -41,8 +39,6 @@ def get_predictions(request: PredictInput) -> PredictOutput:
                 "subject": "DRUGBANK:DB00001",
                 "object": obj,
                 "score": 0.12345,
-                "object_label": "Leipirudin",
-                "object_type": "biolink:Drug",
             }
         )
     return {"hits": predictions, "count": len(predictions)}
