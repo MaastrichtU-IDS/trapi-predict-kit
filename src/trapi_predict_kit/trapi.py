@@ -19,6 +19,25 @@ REQUIRED_TAGS = [
     {"name": "translator"},
 ]
 
+default_trapi_example = {
+    "message": {
+        "query_graph": {
+            "edges": {"e01": {"object": "n1", "predicates": ["biolink:treated_by"], "subject": "n0"}},
+            "nodes": {
+                "n0": {
+                    "categories": ["biolink:Disease"],
+                    "ids": [
+                        "OMIM:246300",
+                        # "MONDO:0007190"
+                    ],
+                },
+                "n1": {"categories": ["biolink:Drug"]},
+            },
+        }
+    },
+    "query_options": {"max_score": 1, "min_score": 0.5, "n_results": 10},
+}
+
 
 class TRAPI(FastAPI):
     """Translator Reasoner API - wrapper for FastAPI."""
@@ -30,6 +49,7 @@ class TRAPI(FastAPI):
         ordered_servers: Optional[List[Dict[str, str]]] = None,
         itrb_url_prefix: Optional[str] = None,
         dev_server_url: Optional[str] = None,
+        trapi_example: Optional[Query] = None,
         info: Optional[Dict[str, Any]] = None,
         title="Translator Reasoner API",
         version="1.0.0",
@@ -53,6 +73,7 @@ class TRAPI(FastAPI):
         if not self.infores and itrb_url_prefix:
             self.infores = f"infores:{itrb_url_prefix}"
         self.openapi_version = openapi_version
+        self.trapi_example = trapi_example if trapi_example else default_trapi_example
 
         # On ITRB deployment and local dev we directly use the current server
         self.servers = []
@@ -106,25 +127,6 @@ class TRAPI(FastAPI):
             allow_headers=["*"],
         )
 
-        trapi_example = {
-            "message": {
-                "query_graph": {
-                    "edges": {"e01": {"object": "n1", "predicates": ["biolink:treated_by"], "subject": "n0"}},
-                    "nodes": {
-                        "n0": {
-                            "categories": ["biolink:Disease"],
-                            "ids": [
-                                "OMIM:246300",
-                                # "MONDO:0007190"
-                            ],
-                        },
-                        "n1": {"categories": ["biolink:Drug"]},
-                    },
-                }
-            },
-            "query_options": {"max_score": 1, "min_score": 0.5, "n_results": 10},
-        }
-
         @self.post(
             "/query",
             name="TRAPI query",
@@ -161,7 +163,7 @@ You can also try this query to retrieve similar entities for a given drug:
             response_model=Query,
             tags=["reasoner"],
         )
-        def post_reasoner_predict(request_body: Query = Body(..., example=trapi_example)) -> Query:
+        def post_reasoner_predict(request_body: Query = Body(..., example=self.trapi_example)) -> Query:
             """Get predicted associations for a given ReasonerAPI query.
 
             :param request_body: The ReasonerStdAPI query in JSON
