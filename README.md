@@ -291,6 +291,11 @@ The deployment of new releases is done automatically by a GitHub Action workflow
 
 1. Make sure the `PYPI_TOKEN` secret has been defined in the GitHub repository (in Settings > Secrets > Actions). You can get an API token from PyPI at [pypi.org/manage/account](https://pypi.org/manage/account).
 2. Increment the `version` number in the `pyproject.toml` file in the root folder of the repository.
+
+    ```bash
+    hatch version fix
+    ```
+
 3. Create a new release on GitHub, which will automatically trigger the publish workflow, and publish the new release to PyPI.
 
 You can also manually trigger the workflow from the Actions tab in your GitHub repository webpage.
