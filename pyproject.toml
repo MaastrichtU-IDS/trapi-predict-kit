@@ -106,6 +106,9 @@ cov = [
 docs = "mkdocs serve -a localhost:8001 {args}"
 
 # TOOLS
+[tool.hatch.build.targets.wheel]
+packages = ["src/trapi_predict_kit"]
+
 [tool.hatch.version]
 path = "src/trapi_predict_kit/__init__.py"
 
