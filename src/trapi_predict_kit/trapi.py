@@ -58,6 +58,7 @@ class TRAPI(FastAPI):
         title="Translator Reasoner API",
         version="1.0.0",
         openapi_version="3.0.1",
+        add_opentelemetry=False,
         description="""Get predicted targets for a given entity
 \n\nService supported by the [NCATS Translator project](https://ncats.nih.gov/translator/about)""",
         **kwargs: Any,
@@ -82,6 +83,9 @@ class TRAPI(FastAPI):
 
         # On ITRB deployment and local dev we directly use the current server
         self.servers = []
+
+        if itrb_url_prefix and add_opentelemetry and not os.environ.get("NO_JAEGER"):
+            add_opentelemetry(self, itrb_url_prefix)
 
         # For the API deployed on our server and registered to SmartAPI we provide the complete list
         if os.getenv("VIRTUAL_HOST"):
@@ -273,3 +277,41 @@ class TRAPI(FastAPI):
         openapi_schema["info"] = {**openapi_schema["info"], **self.info}
         self.openapi_schema = openapi_schema
         return self.openapi_schema
+
+
+def add_opentelemetry(app: TRAPI, service_name: str) -> None:
+    """Configure Open Telemetry
+    https://github.com/ranking-agent/aragorn/blob/main/src/otel_config.py#L4
+    https://ncatstranslator.github.io/TranslatorTechnicalDocumentation/deployment-guide/monitoring/
+    https://github.com/TranslatorSRI/Jaeger-demo"""
+    import logging
+    import warnings
+
+    from opentelemetry import trace
+    from opentelemetry.exporter.jaeger.thrift import JaegerExporter
+    from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
+    from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor
+    from opentelemetry.instrumentation.requests import RequestsInstrumentor
+    from opentelemetry.sdk.resources import SERVICE_NAME, Resource
+    from opentelemetry.sdk.trace import TracerProvider
+    from opentelemetry.sdk.trace.export import BatchSpanProcessor
+
+    logging.info("Starting up jaeger telemetry")
+    # service_name = os.environ.get("OTEL_SERVICE_NAME", service_name)
+    # httpx connections need to be open a little longer by the otel decorators
+    # but some libs display warnings of resource being unclosed.
+    # these supresses such warnings.
+    logging.captureWarnings(capture=True)
+    warnings.filterwarnings("ignore", category=ResourceWarning)
+    trace.set_tracer_provider(TracerProvider(resource=Resource.create({SERVICE_NAME: service_name})))
+    jaeger_host = os.environ.get("JAEGER_HOST", "jaeger-otel-agent.sri")
+    jaeger_port = int(os.environ.get("JAEGER_PORT", "6831"))
+    jaeger_exporter = JaegerExporter(
+        agent_host_name=jaeger_host,
+        agent_port=jaeger_port,
+    )
+    trace.get_tracer_provider().add_span_processor(BatchSpanProcessor(jaeger_exporter))
+    # tracer = trace.get_tracer(__name__)
+    FastAPIInstrumentor.instrument_app(app, tracer_provider=trace, excluded_urls="docs,openapi.json")
+    RequestsInstrumentor().instrument()
+    HTTPXClientInstrumentor().instrument()
