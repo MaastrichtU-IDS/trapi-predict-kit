@@ -58,7 +58,7 @@ class TRAPI(FastAPI):
         title="Translator Reasoner API",
         version="1.0.0",
         openapi_version="3.0.1",
-        add_opentelemetry=False,
+        opentelemetry=False,
         description="""Get predicted targets for a given entity
 \n\nService supported by the [NCATS Translator project](https://ncats.nih.gov/translator/about)""",
         **kwargs: Any,
@@ -72,6 +72,9 @@ class TRAPI(FastAPI):
             root_path_in_servers=False,
             **kwargs,
         )
+        if itrb_url_prefix and opentelemetry and not os.environ.get("NO_JAEGER"):
+            add_opentelemetry(self, itrb_url_prefix)
+
         self.predict_endpoints = predict_endpoints
         self.info = info
         self.infores = self.info.get("x-translator", {}).get("infores")
@@ -83,9 +86,6 @@ class TRAPI(FastAPI):
 
         # On ITRB deployment and local dev we directly use the current server
         self.servers = []
-
-        if itrb_url_prefix and add_opentelemetry and not os.environ.get("NO_JAEGER"):
-            add_opentelemetry(self, itrb_url_prefix)
 
         # For the API deployed on our server and registered to SmartAPI we provide the complete list
         if os.getenv("VIRTUAL_HOST"):
@@ -279,7 +279,7 @@ class TRAPI(FastAPI):
         return self.openapi_schema
 
 
-def add_opentelemetry(app: TRAPI, service_name: str) -> None:
+def add_opentelemetry(app: FastAPI, service_name: str) -> None:
     """Configure Open Telemetry
     https://github.com/ranking-agent/aragorn/blob/main/src/otel_config.py#L4
     https://ncatstranslator.github.io/TranslatorTechnicalDocumentation/deployment-guide/monitoring/
@@ -305,6 +305,7 @@ def add_opentelemetry(app: TRAPI, service_name: str) -> None:
     warnings.filterwarnings("ignore", category=ResourceWarning)
     trace.set_tracer_provider(TracerProvider(resource=Resource.create({SERVICE_NAME: service_name})))
     jaeger_host = os.environ.get("JAEGER_HOST", "jaeger-otel-agent.sri")
+    # jaeger_host = os.environ.get("JAEGER_HOST", "localhost")
     jaeger_port = int(os.environ.get("JAEGER_PORT", "6831"))
     jaeger_exporter = JaegerExporter(
         agent_host_name=jaeger_host,

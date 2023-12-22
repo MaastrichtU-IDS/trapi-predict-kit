@@ -90,4 +90,6 @@ app = TRAPI(
 \n\nService supported by the [NCATS Translator project](https://ncats.nih.gov/translator/about)""",
     itrb_url_prefix="openpredict",
     dev_server_url="https://openpredict.semanticscience.org",
+    # opentelemetry=True,
+    # docker run -d --name jaeger -p 16686:16686 -p 6831:6831/udp jaegertracing/all-in-one:latest
 )
