@@ -312,7 +312,8 @@ def add_opentelemetry(app: FastAPI, service_name: str) -> None:
         agent_port=jaeger_port,
     )
     trace.get_tracer_provider().add_span_processor(BatchSpanProcessor(jaeger_exporter))
-    # tracer = trace.get_tracer(__name__)
-    FastAPIInstrumentor.instrument_app(app, tracer_provider=trace, excluded_urls="docs,openapi.json")
+    trace.get_tracer(__name__)
+    FastAPIInstrumentor.instrument_app(app, excluded_urls="docs,openapi.json")
+    # FastAPIInstrumentor.instrument_app(app, tracer_provider=trace, excluded_urls="docs,openapi.json")
     RequestsInstrumentor().instrument()
     HTTPXClientInstrumentor().instrument()
