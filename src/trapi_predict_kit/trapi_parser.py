@@ -202,7 +202,7 @@ def resolve_trapi_query(reasoner_query, endpoints_list, infores: str = ""):
                             # edge_association_type = 'biolink:ChemicalToDiseaseOrPhenotypicFeatureAssociation'
                             # relation = 'RO:0002434' # interacts with
                             # relation = 'OBOREL:0002606'
-                            association_score = str(association["score"])
+                            association_score = float(association["score"])
 
                             model_id_label = model_id
                             if not model_id_label:
