@@ -273,6 +273,7 @@ def resolve_trapi_query(reasoner_query, endpoints_list, infores: str = ""):
                                         # TODO: pass infores_curie
                                         "resource_id": infores,
                                         "score": association_score,
+                                        "dummy_score": 0.42,
                                         "scoring_method": "Model confidence between 0 and 1",
                                         "edge_bindings": {edge_qg_id: [{"id": edge_kg_id}]},
                                     }
@@ -303,6 +304,9 @@ def resolve_trapi_query(reasoner_query, endpoints_list, infores: str = ""):
         if "label" in properties and properties["label"]:
             node_to_add["name"] = properties["label"]
         knowledge_graph["nodes"][node_id] = node_to_add
+
+    log.warn("DEBUG SCORE THAT SHOULD BE A FLOAT")
+    log.warn(query_results)
 
     return {
         "message": {"knowledge_graph": knowledge_graph, "query_graph": query_graph, "results": query_results},
