@@ -273,7 +273,7 @@ def resolve_trapi_query(reasoner_query, endpoints_list, infores: str = ""):
                                         # TODO: pass infores_curie
                                         "resource_id": infores,
                                         "score": association_score,
-                                        "dummy_score": 0.42,
+                                        # "dummy_score": 0.42,
                                         "scoring_method": "Model confidence between 0 and 1",
                                         "edge_bindings": {edge_qg_id: [{"id": edge_kg_id}]},
                                     }
