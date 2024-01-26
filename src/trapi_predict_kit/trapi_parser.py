@@ -305,9 +305,6 @@ def resolve_trapi_query(reasoner_query, endpoints_list, infores: str = ""):
             node_to_add["name"] = properties["label"]
         knowledge_graph["nodes"][node_id] = node_to_add
 
-    log.warn("DEBUG SCORE THAT SHOULD BE A FLOAT")
-    log.warn(query_results)
-
     return {
         "message": {"knowledge_graph": knowledge_graph, "query_graph": query_graph, "results": query_results},
         "query_options": query_options,
