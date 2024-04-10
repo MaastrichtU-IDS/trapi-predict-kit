@@ -35,7 +35,7 @@ dependencies = [
     "fastapi >=0.68.1",
     "rdflib >=6.1.1",
     "reasoner-pydantic >=3.0.1",
-    "mlem",
+    # "mlem",
     "dvc",
     "bmt",
     # "fairworkflows @ git+https://github.com/vemonet/fairworkflows.git",

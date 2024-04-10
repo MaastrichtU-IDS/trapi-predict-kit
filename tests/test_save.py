@@ -41,12 +41,12 @@ def test_save_pickle():
     shutil.rmtree(tmp_path)
 
 
-def test_save_mlem():
-    """Test to save and load a basic model with mlem"""
-    save(model, model_path, sample_data=data, scores=scores, hyper_params=hyper_params, method="mlem")
-    assert Path(model_path).is_file()
-    assert Path(f"{model_path}.mlem").is_file()
-    assert Path(f"{model_path}.ttl").is_file()
-    loaded_model = load(model_path, method="mlem")
-    assert loaded_model.model is not None
-    shutil.rmtree(tmp_path)
+# def test_save_mlem():
+#     """Test to save and load a basic model with mlem"""
+#     save(model, model_path, sample_data=data, scores=scores, hyper_params=hyper_params, method="mlem")
+#     assert Path(model_path).is_file()
+#     assert Path(f"{model_path}.mlem").is_file()
+#     assert Path(f"{model_path}.ttl").is_file()
+#     loaded_model = load(model_path, method="mlem")
+#     assert loaded_model.model is not None
+#     shutil.rmtree(tmp_path)

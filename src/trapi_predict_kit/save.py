@@ -3,7 +3,7 @@ import pickle
 from dataclasses import dataclass
 from typing import Any, Optional
 
-from mlem import api as mlem
+# from mlem import api as mlem
 from rdflib import Graph
 
 # from mlem.api import save as mlem_save, load as mlem_load
@@ -42,11 +42,11 @@ def save(
 
     # mlem_model = MlemModel.from_obj(model, sample_data=sample_data)
     # mlem_model.dump(path)
-    if method == "mlem":
-        mlem.save(model, path, sample_data=sample_data)
-    else:
-        with open(path, "wb") as f:
-            pickle.dump(model, f)
+    # if method == "mlem":
+    #     mlem.save(model, path, sample_data=sample_data)
+    # else:
+    with open(path, "wb") as f:
+        pickle.dump(model, f)
 
     g = get_run_metadata(scores, sample_data, hyper_params, model_name)
     g.serialize(f"{path}.ttl", format="ttl")
@@ -63,11 +63,11 @@ def save(
 
 def load(path: str, method: str = "pickle") -> LoadedModel:
     log.info(f"💽 Loading model from {path} using {method}")
-    if method == "mlem":
-        model = mlem.load(path)
-    else:
-        with open(path, "rb") as f:
-            model = pickle.load(f)
+    # if method == "mlem":
+    #     model = mlem.load(path)
+    # else:
+    with open(path, "rb") as f:
+        model = pickle.load(f)
 
     g = Graph()
     g.parse(f"{path}.ttl", format="ttl")
