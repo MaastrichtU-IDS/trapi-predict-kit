@@ -174,10 +174,10 @@ app = TRAPI(
 
 ### Deploy the API
 
-Change `trapi.main` to your module path in the command before running it:
+Run the webserver with the path to the api file:
 
 ```bash
-uvicorn trapi.main:app --port 8808 --reload
+uvicorn src.my_model.api:app --port 8808 --reload
 ```
 
 ### 💾 Save a generated model
