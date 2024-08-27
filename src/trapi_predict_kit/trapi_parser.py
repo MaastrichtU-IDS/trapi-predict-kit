@@ -275,18 +275,28 @@ def resolve_trapi_query(reasoner_query, endpoints_list, infores: str = ""):
                                         "score": association_score,
                                         # "dummy_score": 0.42,
                                         "scoring_method": "Model confidence between 0 and 1",
-                                        "edge_bindings": {edge_qg_id: [{"id": edge_kg_id,
-                                                                        "attributes": [],}]},                                        
+                                        "edge_bindings": {
+                                            edge_qg_id: [
+                                                {
+                                                    "id": edge_kg_id,
+                                                    "attributes": [],
+                                                }
+                                            ]
+                                        },
                                     }
                                 ],
                             }
                             result["node_bindings"][query_plan[edge_id]["qg_subject_node_id"]] = [
-                                {"id": association["subject"],
-                                 "attributes": [],}
+                                {
+                                    "id": association["subject"],
+                                    "attributes": [],
+                                }
                             ]
                             result["node_bindings"][query_plan[edge_id]["qg_object_node_id"]] = [
-                                {"id": association["object"],
-                                 "attributes": [],}
+                                {
+                                    "id": association["object"],
+                                    "attributes": [],
+                                }
                             ]
                             query_results.append(result)
 
@@ -301,10 +311,7 @@ def resolve_trapi_query(reasoner_query, endpoints_list, infores: str = ""):
             node_category = "biolink:" + node_category.capitalize()
         if isinstance(node_category, str):
             node_category = [node_category]
-        node_to_add = {
-            "categories": node_category,
-            "attributes": []
-        }
+        node_to_add = {"categories": node_category, "attributes": []}
         if "label" in properties and properties["label"]:
             node_to_add["name"] = properties["label"]
         knowledge_graph["nodes"][node_id] = node_to_add

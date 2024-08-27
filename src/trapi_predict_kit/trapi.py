@@ -1,7 +1,7 @@
+import logging
 import os
 import time
 from typing import Any, Callable, Dict, List, Optional
-import logging
 
 from fastapi import Body, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -319,8 +319,11 @@ def add_opentelemetry(app: FastAPI, service_name: str) -> None:
     RequestsInstrumentor().instrument()
     HTTPXClientInstrumentor().instrument()
 
-# Filter out /health endpoint to stop flooding uvicorn log 
+
+# Filter out /health endpoint to stop flooding uvicorn log
 class EndpointFilter(logging.Filter):
     def filter(self, record: logging.LogRecord) -> bool:
         return record.getMessage().find("/health") == -1
+
+
 logging.getLogger("uvicorn.access").addFilter(EndpointFilter())
