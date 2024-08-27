@@ -190,13 +190,25 @@ def resolve_trapi_query(reasoner_query, endpoints_list, infores: str = ""):
                             if "subject_label" in association:
                                 node_dict[subject_id]["label"] = association["subject_label"]
                             else:
-                                if subject_id in labels_dict and labels_dict[subject_id]:
+                                # if subject_id in labels_dict and labels_dict[subject_id]:
+                                if (
+                                    subject_id in labels_dict
+                                    and labels_dict[subject_id]
+                                    and "id" in labels_dict[subject_id]
+                                    and "label" in labels_dict[subject_id]["id"]
+                                ):
                                     node_dict[subject_id]["label"] = labels_dict[subject_id]["id"]["label"]
 
                             if "object_label" in association:
                                 node_dict[object_id]["label"] = association["object_label"]
                             else:
-                                if object_id in labels_dict and labels_dict[object_id]:
+                                # if object_id in labels_dict and labels_dict[object_id]:
+                                if (
+                                    object_id in labels_dict
+                                    and labels_dict[object_id]
+                                    and "id" in labels_dict[object_id]
+                                    and "label" in labels_dict[object_id]["id"]
+                                ):
                                     node_dict[object_id]["label"] = labels_dict[object_id]["id"]["label"]
 
                             # edge_association_type = 'biolink:ChemicalToDiseaseOrPhenotypicFeatureAssociation'
