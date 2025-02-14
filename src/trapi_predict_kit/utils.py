@@ -132,7 +132,7 @@ def get_entity_types(entity: str) -> Any:
     )
     # Get corresponding OMIM IDs for MONDO IDs if match
     resp = resolve_curies.json()
-    if entity in resp:
+    if entity in resp and resp[entity] is not None:
         return resp[entity]["type"]
     return []
 
