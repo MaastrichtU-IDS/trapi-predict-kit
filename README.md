@@ -13,7 +13,7 @@
 
 A package to help create and deploy Translator Reasoner APIs (TRAPI) from any prediction model exposed as a regular python function.
 
-The **TRAPI Predict Kit** helps data scientists to build, and **publish prediction models** in a [FAIR](https://www.go-fair.org/fair-principles/) and reproducible manner. It provides helpers for various steps of the process:
+The **TRAPI Predict Kit** helps data scientists build, and **publish prediction models** in a [FAIR](https://www.go-fair.org/fair-principles/) and reproducible manner. It provides helpers for various steps of the process:
 
 * A template to help user quickly bootstrap a new prediction project with the recommended structure ([MaastrichtU-IDS/cookiecutter-trapi-predict-kit](https://github.com/MaastrichtU-IDS/cookiecutter-trapi-predict-kit/))
 * Helper function to easily save a generated model, its metadata, and the data used to generate it. It uses tools such as [`dvc`](https://dvc.org/) to store large model outside of the git repository.
